@@ -1,1 +1,1 @@
-# synesthesia_trainer
+# Synesthesia Trainer
