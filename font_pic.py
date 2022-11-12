@@ -51,18 +51,17 @@ font_label.grid(row=0, column=0)
 size_label = Label(font_frame, text='Size')
 size_label.grid(row=0, column=1)
 
-# Font listbox
+# Font treeview
+style = Style()
 font_treeview = Treeview(font_frame, show='tree', selectmode=BROWSE)
 font_treeview.grid(row=1, column=0)
-style = Style()
-style.configure('Treeview', rowheight=27)
-
+font_treeview.column('#0', width=265)
 fonts_scrollbar = Scrollbar(font_frame, orient="vertical", command=font_treeview.yview)
 fonts_scrollbar.grid(row=1, column=0, sticky='nse')
 font_treeview.configure(yscroll=fonts_scrollbar.set, xscroll=fonts_scrollbar.set)
 
 # Size listbox
-font_size_listbox = Listbox(font_frame, selectmode=SINGLE, width=20)
+font_size_listbox = Listbox(font_frame, selectmode=SINGLE, width=5)
 font_size_listbox.grid(row=1, column=1)
 
 # add fonts to treeview
@@ -75,8 +74,14 @@ if 'Noto Color Emoji' in fonts:
 for font_name in fonts:
     font_tag = font_name.replace(' ', '_')
     font_treeview.insert('', END, text=font_name, tags=(font_tag,))
-    font_treeview.tag_configure(font_tag, font=(font_name,))
+    font_treeview.tag_configure(font_tag, font=(font_name, 11))
     font_treeview.tag_bind(font_tag, '<ButtonRelease-1>', change_font)
+    # adjusting sizes of the cells by font height
+    font_height = font.Font(font=font_tag).metrics('ascent')*1.3 + font.Font(font=font_tag).metrics('descent')*2
+    style.configure('Treeview', rowheight=int(font_height))
+
+# removing some empty row from a treeview
+font_treeview.delete(font_treeview.get_children()[81])
 
 # add sizes to listbox
 font_sizes = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
