@@ -65,8 +65,14 @@ font_treeview.configure(yscroll=fonts_scrollbar.set, xscroll=fonts_scrollbar.set
 font_size_listbox = Listbox(font_frame, selectmode=SINGLE, width=20)
 font_size_listbox.grid(row=1, column=1)
 
-# add fonts to listbox
-for font_name in sorted(set(font.families())):
+# add fonts to treeview
+fonts = sorted(set(font.families()))
+
+# Noto Color Emoji causes the app to crash for some unknown reason, so...
+if 'Noto Color Emoji' in fonts:
+    fonts.remove('Noto Color Emoji')
+
+for font_name in fonts:
     font_tag = font_name.replace(' ', '_')
     font_treeview.insert('', END, text=font_name, tags=(font_tag,))
     font_treeview.tag_configure(font_tag, font=(font_name,))
