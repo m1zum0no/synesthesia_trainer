@@ -1,18 +1,3 @@
-""" Enable ANSI on Windows
-reg add HKEY_CURRENT_USER\Console /v VirtualTerminalLevel /t REG_DWORD /d 1
-Disable ANSI on Windows
-reg add HKEY_CURRENT_USER\Console /v VirtualTerminalLevel /t REG_DWORD /d 0 
-
-import os
-os.system("")  # enables ansi escape characters in terminal - stands for ("color")
-# or 
-import os
-if os.name == 'nt': # Only if we are running on Windows
-    from ctypes import windll
-    k = windll.kernel32
-    k.SetConsoleMode(k.GetStdHandle(-11), 7)
-"""
-
 from tkinter import *
 from tkinter import filedialog
 from tkinter import font
@@ -30,6 +15,34 @@ color_table = {'def': '#ffffff','e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a', 
 'g': '#77afa1', 'w': '#4c70ac', 'y': '#53ac4c', 'b': '#86ac4c', 
 'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a', 
 'q': '#b6e037', 'z': '#622c2d'}
+
+# for OS-dependent icon rendition
+def find_platform():
+    import sys
+    if sys.platform.startswith('linux'):
+        return 'Linux'
+    elif sys.platform == 'darwin':
+        return 'Mac'
+    elif ('win' in sys.platform and not 'dar') or 'msys':
+        return 'Win'
+
+def display_window_icon():
+    if platform_name == 'Linux':
+        try:
+            root.call('wm', 'iconphoto', root._w, './icons/text-editor.xbm')
+        except:
+            pass
+    else:
+        icon = Image.open(r'./icons/text-editor.png')
+        try:  # for Mac
+            root.iconbitmap(icon) 
+        except:  # Windows
+            if icon.mode in ['RGBA', 'P']:  # for testing other icon options:
+                # remove format attributes that hinder further conversion     
+                icon = icon.convert('RGB')
+            icon.save('./icons/text-editor.ico', format = 'ICO', sizes=[(32,32)])
+            # makes icon default for all the window descendents
+            root.iconbitmap(default='./icons/text-editor.ico')
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
@@ -122,9 +135,23 @@ def apply_color():  # editing of text by char
 root = Tk()
 root.title('Synesthesia Trainer')
 root.geometry('800x570')
-"""try:
-    root.iconbitmap('./path_to_icon')
-except"""
+global platform_name
+platform_name = find_platform()
+
+# test necessity of making changes for WinOS
+if platform_name == 'Windows':
+    # enable ansi escape characters in terminal 
+    import os
+    os.system("")  # stands for "color"
+    """ 
+    # alternative
+    import os
+    from ctypes import windll
+    k = windll.kernel32
+    k.SetConsoleMode(k.GetStdHandle(-11), 7)
+    """
+
+display_window_icon()
 
 # toolbar frame
 toolbar_frame = Frame(root)
@@ -144,7 +171,7 @@ scroll_frame.grid(sticky="nw")
 scroll_output = Scrollbar(scroll_frame, orient='vertical')
 scroll_output.pack(side=RIGHT, fill=Y)
 
-# Text widget
+# text widget
 textbox = Text(text_frame, width=76, height=20, selectbackground='grey', selectforeground='white', wrap=WORD, yscrollcommand=scroll_output.set)
 textbox.grid(row=0, column=0, sticky="nsew")
 
@@ -156,7 +183,7 @@ root.bind('<Control-A>', select_all)
 
 
 # toolbar buttons
-img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((50,50)))
+img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47,47)))
 bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
 
