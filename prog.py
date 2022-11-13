@@ -28,10 +28,12 @@ def find_platform():
 
 def display_window_icon():
     if platform_name == 'Linux':
-        try:
-            root.call('wm', 'iconphoto', root._w, './icons/text-editor.xbm')
-        except:
-            pass
+        #try:
+        icon = Image.open(r'./icons/text-editor.xbm')
+        icon = icon.resize((32, 32), Image.ANTIALIAS)
+        root.call('wm', 'iconphoto', root._w, icon)
+        #except:
+        #    pass
     else:
         icon = Image.open(r'./icons/text-editor.png')
         try:  # for Mac
