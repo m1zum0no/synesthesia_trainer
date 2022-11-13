@@ -153,7 +153,11 @@ if platform_name == 'Windows':
     k.SetConsoleMode(k.GetStdHandle(-11), 7)
     """
 
-display_window_icon()
+
+#display_window_icon()
+img = PhotoImage(file='icons/text-editor.png')
+root.wm_iconphoto(True, img)
+
 
 # toolbar frame
 toolbar_frame = Frame(root)
