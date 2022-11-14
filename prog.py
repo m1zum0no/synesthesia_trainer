@@ -28,23 +28,15 @@ def find_platform():
 
 def display_window_icon():
     if platform_name == 'Linux':
-        #try:
-        icon = Image.open(r'./icons/text-editor.xbm')
-        icon = icon.resize((32, 32), Image.ANTIALIAS)
-        root.call('wm', 'iconphoto', root._w, icon)
-        #except:
-        #    pass
+        icon = PhotoImage(file='icons/palette.png')
+        root.wm_iconphoto(True, icon)
+#   icon = Image.open('icons/palette.png')        
+#   if platform_name == 'Mac':
+#       icon.save('icons/palette.icns',format = 'ICNS', sizes=[(32,32)])
+#       root.iconbitmap('icons/palette.icns') 
     else:
-        icon = Image.open(r'./icons/text-editor.png')
-        try:  # for Mac
-            root.iconbitmap(icon) 
-        except:  # Windows
-            if icon.mode in ['RGBA', 'P']:  # for testing other icon options:
-                # remove format attributes that hinder further conversion     
-                icon = icon.convert('RGB')
-            icon.save('./icons/text-editor.ico', format = 'ICO', sizes=[(32,32)])
-            # makes icon default for all the window descendents
-            root.iconbitmap(default='./icons/text-editor.ico')
+        icon = Image.open('icons/palette.png')
+        icon.save('./icons/palette.ico', format = 'ICO', sizes=[(32,32)])
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
@@ -152,11 +144,7 @@ if platform_name == 'Windows':
     k = windll.kernel32
     k.SetConsoleMode(k.GetStdHandle(-11), 7)
     """
-
-
-#display_window_icon()
-img = PhotoImage(file='icons/text-editor.png')
-root.wm_iconphoto(True, img)
+display_window_icon()
 
 
 # toolbar frame
@@ -189,22 +177,25 @@ root.bind('<Control-A>', select_all)
 
 
 # toolbar buttons
+select_all_button = Button(toolbar_frame, text='Выделить все', command=lambda: select_all(True))
+select_all_button.grid(row=0, column=2)
+
 img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47,47)))
-bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0)
+# Obtaining the system-dependent background color value of the button to disable square-shaped 
+# highlighting ot the buttons with images when the mouse is hovered over them.
+default_button_color = select_all_button['bg']
+bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
 
 img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41,41)))
-italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0)
+italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
 italics_button.grid(row=0, column=1, pady=8)
-
-select_all_button = Button(toolbar_frame, text='Выделить все', command=lambda: select_all(True))
-select_all_button.grid(row=0, column=2)
 
 clear_button = Button(toolbar_frame, text='Очистить', command=clear)
 clear_button.grid(row=0, column=3, padx=10)
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35,35)))
-apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0)
+apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
 apply_button.grid(row=0, column=4)
 
 
