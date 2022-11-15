@@ -1,8 +1,7 @@
-from tkinter import *
+from tkinter import font, Tk, Frame, Text, Label, Button, Listbox, Scrollbar, Menu, Toplevel, PhotoImage
 from tkinter import filedialog
-from tkinter import font
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
-from tkinter.constants import SINGLE, END, WORD, BROWSE
+from tkinter.constants import SINGLE, BOTTOM, END, WORD, BROWSE, X, Y, TOP, RIGHT, W, E
 from tkinter.ttk import Treeview, Style
 
 diff_lvl = [ 'e', 't', 'a', 'o', 'i','n', 
