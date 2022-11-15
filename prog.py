@@ -218,28 +218,33 @@ text_frame.grid_columnconfigure(0, weight=1)
 scroll_frame = Frame(text_frame)
 scroll_frame.grid(sticky="nw")
 
-# scrollbar init
+# Text widget and its scrollbar 
 scroll_output = Scrollbar(scroll_frame, orient='vertical')
 scroll_output.pack(side=RIGHT, fill=Y)
-
-# text widget
-textbox = Text(text_frame, width=76, height=20, selectbackground='grey', selectforeground='white', wrap=WORD, yscrollcommand=scroll_output.set)
+set_font = font.Font(family='Helvetica', size=16)
+textbox = Text(text_frame, font=set_font,
+                width=76, height=20, selectbackground='grey', selectforeground='white', 
+                wrap=WORD, yscrollcommand=scroll_output.set)
 textbox.grid(row=0, column=0, sticky="nsew")
-
-# scrollbar config
 scroll_output.config(command=textbox.yview)
 
-# configuring key shortcut
-root.bind('<Control-A>', select_all)
 
-# toolbar buttons
-select_all_button = Button(toolbar_frame, text='Выделить все', command=lambda: select_all(True))
-select_all_button.grid(row=0, column=2)
+# Toolbar buttons
+# Font Picker setup 
+font_picker_opener = Button(toolbar_frame, text=set_font['family'], command=click_opener)
+popup_opened = False  # flag for tracking multiple attempts to open popups
+font_picker_opener.grid(row=0, column=2, padx=10)
+# retrieve all system fonts
+fonts = sorted(set(font.families()))
+# remove Noto Color Emoji font, which causes crashes on some systems
+if 'Noto Color Emoji' in fonts:
+    fonts.remove('Noto Color Emoji')
 
 img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47,47)))
 # Obtaining the system-dependent background color value of the button to disable square-shaped 
 # highlighting ot the buttons with images when the mouse is hovered over them.
-default_button_color = select_all_button['bg']
+default_button_color = font_picker_opener['bg']
+
 bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
 
@@ -249,19 +254,7 @@ italics_button.grid(row=0, column=1, pady=8)
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35,35)))
 apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
-apply_button.grid(row=0, column=4)
-
-
-# Font Picker setup 
-set_font = font.Font(family='Helvetica', size=16)
-font_picker_opener = Button(toolbar_frame, text=set_font['family'], command=click_opener)
-popup_opened = False  # flag for tracking multiple attempts to open popups
-font_picker_opener.grid(row=0, column=3, padx=10)
-# retrieve all system fonts
-fonts = sorted(set(font.families()))
-# remove Noto Color Emoji font, which causes crashes on some systems
-if 'Noto Color Emoji' in fonts:
-    fonts.remove('Noto Color Emoji')
+apply_button.grid(row=0, column=3)
 
 
 # Menu
@@ -275,9 +268,13 @@ top_menu.add_cascade(label='Файл', menu=menu_option_file)
 menu_option_file.add_command(label='Открыть', command=load_file)
 menu_option_file.add_command(label='Создать')
 menu_option_file.add_command(label='Сохранить как...', command=save_file_as)
-menu_option_file.add_command(label='Очистить', command=clear)
 menu_option_file.add_separator()
 menu_option_file.add_command(label='Выйти', command=root.quit)
+
+menu_option_edit = Menu(top_menu, tearoff=False)
+top_menu.add_cascade(label='Редактировать', menu=menu_option_edit)
+menu_option_edit.add_command(label='Очистить', command=clear)
+menu_option_edit.add_command(label='Выделить все', command=lambda: select_all(True))
 
 menu_option_palette = Menu(top_menu, tearoff=False)
 top_menu.add_cascade(label='Палитра', menu=menu_option_palette)
@@ -288,6 +285,9 @@ menu_option_level = Menu(top_menu, tearoff=False)
 top_menu.add_cascade(label='Уровень', menu=menu_option_level)
 menu_option_level.add_command(label='Описание')
 menu_option_level.add_command(label='Выбрать')
+
+# configuring key shortcut
+root.bind('<Control-A>', select_all)
 
 # Status bar
 status_bar = Label(root, text='', anchor=E)
