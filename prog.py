@@ -1,76 +1,34 @@
-from tkinter import font, Tk, Frame, Text, Label, Button, Listbox, Scrollbar, Menu, Toplevel, PhotoImage
-from tkinter import filedialog
+from tkinter import filedialog, PhotoImage, Menu, Tk, Frame, Text, Scrollbar, Label, Button
+from tkinter import font
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
-from tkinter.constants import SINGLE, BOTTOM, END, WORD, BROWSE, X, Y, TOP, RIGHT, W, E
-from tkinter.ttk import Treeview, Style
+from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W
 
-diff_lvl = [ 'e', 't', 'a', 'o', 'i','n', 
+
+from font_popup import FontPopup
+
+diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
             's', 'r', 'h', 'l', 'd', 'c', 
             'u', 'm', 'f', 'p', 'g', 'w', 
-'y', 'b', 'v', 'k', 'x', 'j', 'q', 'z'  ]
+            'y', 'b', 'v', 'k', 'x', 'j',
+            'q', 'z']
 
-color_table = {'def': '#ffffff','e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a', 'o': '#8a94d1', 
-'i': '#b98ad1', 'n': '#a2d18a', 's': '#d5ff0a', 'r': '#b7efe0', 
-'h': '#596f69', 'l': '#171136', 'd': '#423e56', 'c': '#b989be', 
-'u': '#21236d', 'm': '#426a4a', 'f': '#ddc96c', 'p': '#b3b3af', 
-'g': '#77afa1', 'w': '#4c70ac', 'y': '#53ac4c', 'b': '#86ac4c', 
-'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a', 
-'q': '#b6e037', 'z': '#622c2d'}
+color_table = {'def': '#ffffff', 'e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a', 'o': '#8a94d1',
+               'i': '#b98ad1', 'n': '#a2d18a', 's': '#d5ff0a', 'r': '#b7efe0',
+               'h': '#596f69', 'l': '#171136', 'd': '#423e56', 'c': '#b989be',
+               'u': '#21236d', 'm': '#426a4a', 'f': '#ddc96c', 'p': '#b3b3af',
+               'g': '#77afa1', 'w': '#4c70ac', 'y': '#53ac4c', 'b': '#86ac4c',
+               'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a',
+               'q': '#b6e037', 'z': '#622c2d'}
 
-def handle_font_picker_exit(event):
-    popup.destroy()
-    global popup_opened
-    popup_opened = False
 
-def apply_font_change(event):
-    set_font.config(family=font_treeview.item(font_treeview.selection()).get('text'))
-    font_picker_opener.config(text=set_font['family'])
-    if popup_opened:
-        handle_font_picker_exit(True)
-
-def display_font_picker():
-    style = Style()
-    global font_treeview
-    font_treeview = Treeview(popup, show='tree', selectmode=BROWSE)
-    font_treeview.grid(row=1, column=0)
-    # to configure the optimal width of the treeview for all font names to fit in fully
-    max_font_width = 0
-    for font_name in fonts:
-        font_tag = font_name.replace(' ', '_')
-        font_treeview.insert('', END, text=font_name, tags=(font_tag,))
-        font_treeview.tag_configure(font_tag, font=(font_name, 11))
-        # adjusting dimensions of the cells to fit various fonts
-        font_to_measure = font.Font(family=font_name, size=11)
-        font_height = font_to_measure.metrics("linespace")
-        ''' exception for a particular problematic font on Linux 
-        if font_name == 'MathJax_WinIE6':  # esint10 isn't getting displayed
-            # ???
-        else: '''    
-        style.configure('Treeview', rowheight=font_height)
-        font_width = font_to_measure.measure(font_name)
-        # basing the window width on the parameters of the widest font
-        max_font_width = max(max_font_width, font_width)
-    font_treeview.column('#0', width=max_font_width + 40)
-    # freeze window size configuration
-    popup.resizable(False, False)
-    fonts_scrollbar = Scrollbar(popup, orient='vertical', command=font_treeview.yview)
-    fonts_scrollbar.grid(row=1, column=0, sticky='nse')
-    font_treeview.configure(yscroll=fonts_scrollbar.set)
-    # save changes and close the popup window 
-    font_treeview.bind('<Double-Button-1>', apply_font_change)
-    font_treeview.bind('<Return>', apply_font_change)
+def apply_font_change(font_name):
+    set_font.config(family=font_name)
+    font_picker_opener.config(text=font_name)
 
 
 def click_opener():
-    # deactivate the button to avoid overlaying popups
-    global popup_opened
-    if not popup_opened: 
-        global popup
-        popup = Toplevel(root)
-        popup.title('Выбрать шрифт')
-        popup_opened = True
-        popup.protocol('WM_DELETE_WINDOW', lambda: handle_font_picker_exit(popup))
-        display_font_picker()
+    font_popup.deiconify()
+
 
 # for OS-dependent icon rendition
 def find_platform():
@@ -82,6 +40,7 @@ def find_platform():
     elif ('win' in sys.platform and not 'dar') or 'msys':
         return 'Win'
 
+
 def display_window_icon():
     if platform_name == 'Linux':
         icon = PhotoImage(file='icons/palette.png')
@@ -92,11 +51,13 @@ def display_window_icon():
 #       root.iconbitmap('icons/palette.icns') 
     else:
         icon = Image.open('icons/palette.png')
-        icon.save('./icons/palette.ico', format = 'ICO', sizes=[(32,32)])
+        icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
+
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
     textbox.tag_add('sel', '1.0', 'end')
+
 
 def text_to_bold():
     bold_font = font.Font(textbox, textbox.cget("font"))
@@ -110,6 +71,7 @@ def text_to_bold():
     else:
         textbox.tag_add('bold', 'sel.first', 'sel.last')
 
+
 def text_to_italics():
     italics_font = font.Font(textbox, textbox.cget("font"))
     italics_font.configure(slant='italic')
@@ -122,6 +84,7 @@ def text_to_italics():
     else:
         textbox.tag_add('italic', 'sel.first', 'sel.last')
 
+
 def rgb(hex_rgb):
     str_rgb = hex_rgb.replace('#', '')
     r = int(str_rgb[:2], 16)
@@ -129,10 +92,12 @@ def rgb(hex_rgb):
     b = int(str_rgb[4:], 16)
     return f'\033[38;2;{r};{g};{b}m'
 
+
 def encode_color(ch):
     if ch.lower() in diff_lvl[:5 * 5]:
         return rgb(color_table[ch.lower()]) + ch
     return ch
+
 
 # display names of the currently opened files
 def update_status(filepath):
@@ -144,6 +109,7 @@ def update_status(filepath):
     root.title(f'{filename} - Synesthesia Trainer')
     status_bar.config(text=f'{filename}   ')
 
+
 def save_file_as():
     output_file = filedialog.asksaveasfilename(defaultextension='.*', title='Введите название...')
     if output_file:  # if not 'cancel'
@@ -153,22 +119,26 @@ def save_file_as():
             for ch in txt:
                 output_file.write(encode_color(ch)) 
 
+
 def load_file():
     # prep for loading
-    clear  # rm prev contents
+     # rm prev contents
     input_file = filedialog.askopenfilename(title='Выберите файл...')
     input_file = input_file.replace('\\', '/')
     update_status(input_file)
     # load the file
     with open(input_file, 'r', encoding='utf-8') as input_file:
         loaded_text = input_file.read()
+        clear()
         textbox.insert(END, loaded_text)
+
 
 # buttons
 def clear():
     textbox.delete(1.0, END)
     root.title('Synesthesia Trainer')
     status_bar.config(text='')
+
 
 def apply_color():  # editing of text by char
     text_str = textbox.get(1.0, END)
@@ -180,6 +150,7 @@ def apply_color():  # editing of text by char
                 textbox.tag_add(color, f'{line_index}.{char_index}')
     for color in color_table.values():
         textbox.tag_config(color, foreground=color)
+
 
 # root frame
 root = Tk()
@@ -222,8 +193,8 @@ scroll_output = Scrollbar(scroll_frame, orient='vertical')
 scroll_output.pack(side=RIGHT, fill=Y)
 set_font = font.Font(family='Helvetica', size=16)
 textbox = Text(text_frame, font=set_font,
-                width=76, height=20, selectbackground='grey', selectforeground='white', 
-                wrap=WORD, yscrollcommand=scroll_output.set)
+               width=76, height=20, selectbackground='grey', selectforeground='white',
+               wrap=WORD, yscrollcommand=scroll_output.set)
 textbox.grid(row=0, column=0, sticky="nsew")
 scroll_output.config(command=textbox.yview)
 
@@ -233,26 +204,27 @@ scroll_output.config(command=textbox.yview)
 font_picker_opener = Button(toolbar_frame, text=set_font['family'], command=click_opener)
 popup_opened = False  # flag for tracking multiple attempts to open popups
 font_picker_opener.grid(row=0, column=2, padx=10)
-# retrieve all system fonts
-fonts = sorted(set(font.families()))
-# remove Noto Color Emoji font, which causes crashes on some systems
-if 'Noto Color Emoji' in fonts:
-    fonts.remove('Noto Color Emoji')
 
-img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47,47)))
+img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47, 47)))
 # Obtaining the system-dependent background color value of the button to disable square-shaped 
 # highlighting ot the buttons with images when the mouse is hovered over them.
 default_button_color = font_picker_opener['bg']
 
-bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
+bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0,
+                     activebackground=default_button_color, highlightbackground=default_button_color,
+                     highlightthickness=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
 
-img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41,41)))
-italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
+img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41, 41)))
+italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
+                        activebackground=default_button_color, highlightbackground=default_button_color,
+                        highlightthickness=0)
 italics_button.grid(row=0, column=1, pady=8)
 
-img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35,35)))
-apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0, activebackground=default_button_color, highlightbackground=default_button_color, highlightthickness=0)
+img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
+apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
+                      activebackground=default_button_color, highlightbackground=default_button_color,
+                      highlightthickness=0)
 apply_button.grid(row=0, column=3)
 
 
@@ -285,6 +257,7 @@ top_menu.add_cascade(label='Уровень', menu=menu_option_level)
 menu_option_level.add_command(label='Описание')
 menu_option_level.add_command(label='Выбрать')
 
+
 # configuring key shortcut
 root.bind('<Control-A>', select_all)
 
@@ -292,5 +265,6 @@ root.bind('<Control-A>', select_all)
 status_bar = Label(root, text='', anchor=E)
 status_bar.pack(fill=X, side=BOTTOM, pady=5)  
 
+font_popup = FontPopup(root, font_changed_callback=apply_font_change)
 
 root.mainloop()
