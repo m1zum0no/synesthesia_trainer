@@ -214,14 +214,19 @@ font_size_options = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
 font_size = StringVar(toolbar_frame)
 font_size.set(set_font['size'])
 font_size_menu = ttk.Combobox(toolbar_frame, textvariable=font_size, values=font_size_options, width=4, state='readonly')
-font_size_menu.bind('<ButtonRelease>', textbox.focus_set())
 font_size_menu.grid(row=0, column=3, padx=10)
 font_size_menu.bind("<<ComboboxSelected>>", apply_font_size_change)
-ttk.Style().configure('TCombobox', relief='groove', selectbackground=default_button_color, selectforeground='', 
-                    fieldbackground=default_button_color, background=default_button_color,
-                    activebackground=default_button_color, highlightbackground=default_button_color,
-                    highlightthickness=0)
 
+def highlight_clear(event):
+      current = font_size.get()
+      font_size.set("")
+      font_size.set(current)
+
+font_size_menu.bind("<<ComboboxSelected>>", highlight_clear)
+ttk.Style().configure('TCombobox', relief='raised', selectbackground=default_button_color, selectforeground='', 
+                    fieldbackground=default_button_color,
+                    activebackground=default_button_color,
+                    highlightforeground=default_button_color, highlightthickness=0)
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
 apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
