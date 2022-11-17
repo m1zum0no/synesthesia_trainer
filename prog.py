@@ -40,7 +40,7 @@ def find_platform():
         return 'Linux'
     elif sys.platform == 'darwin':
         return 'Mac'
-    elif sys.platform.startswith('win') or sys.platform.startswith('msys'):
+    elif 'win' in sys.platform or sys.platform.startswith('msys'):
         return 'Win'
 
 
@@ -55,12 +55,6 @@ def display_window_icon():
     else:
         icon = Image.open('icons/palette.png')
         icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
-
-
-# adding standard functionality Ctrl-A
-def select_all(press_key_event):
-    textbox.tag_add('sel', '1.0', 'end')
-
 
 def text_to_bold():
     bold_font = font.Font(textbox, textbox.cget("font"))
@@ -124,20 +118,19 @@ def save_file_as():
 
 
 def load_file():
-    # prep for loading
-     # rm prev contents
+    # rm prev contents
+    close_file()
     input_file = filedialog.askopenfilename(title='Выберите файл...')
     input_file = input_file.replace('\\', '/')
     update_status(input_file)
     # load the file
     with open(input_file, 'r', encoding='utf-8') as input_file:
         loaded_text = input_file.read()
-        clear()
         textbox.insert(END, loaded_text)
 
 
 # buttons
-def clear():
+def close_file():
     textbox.delete(1.0, END)
     root.title('Synesthesia Trainer')
     status_bar.config(text='')
@@ -153,6 +146,10 @@ def apply_color():  # editing of text by char
                 textbox.tag_add(color, f'{line_index}.{char_index}')
     for color in color_table.values():
         textbox.tag_config(color, foreground=color)
+
+# adding standard functionality Ctrl-A
+def select_all(press_key_event):
+    textbox.tag_add('sel', '1.0', 'end')
 
 
 # root frame
@@ -248,18 +245,14 @@ root.config(menu=top_menu)
 
 # Menu options
 menu_option_file = Menu(top_menu, tearoff=False)
-top_menu.add_cascade(label='Файл', menu=menu_option_file)
 
-menu_option_file.add_command(label='Открыть', command=load_file)
+top_menu.add_cascade(label='Файл', menu=menu_option_file)
 menu_option_file.add_command(label='Создать')
+menu_option_file.add_command(label='Открыть', command=load_file)
 menu_option_file.add_command(label='Сохранить как...', command=save_file_as)
+menu_option_file.add_command(label='Закрыть', command=close_file)
 menu_option_file.add_separator()
 menu_option_file.add_command(label='Выйти', command=root.quit)
-
-menu_option_edit = Menu(top_menu, tearoff=False)
-top_menu.add_cascade(label='Редактировать', menu=menu_option_edit)
-menu_option_edit.add_command(label='Очистить', command=clear)
-menu_option_edit.add_command(label='Выделить все', command=lambda: select_all(True))
 
 menu_option_palette = Menu(top_menu, tearoff=False)
 top_menu.add_cascade(label='Палитра', menu=menu_option_palette)
