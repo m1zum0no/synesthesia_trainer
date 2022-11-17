@@ -40,7 +40,7 @@ def find_platform():
         return 'Linux'
     elif sys.platform == 'darwin':
         return 'Mac'
-    elif ('win' in sys.platform and not 'dar') or 'msys':
+    elif sys.platform.startswith('win') or sys.platform.startswith('msys'):
         return 'Win'
 
 
