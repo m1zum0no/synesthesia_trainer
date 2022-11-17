@@ -57,30 +57,18 @@ def display_window_icon():
         icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
 
 def text_to_bold():
-    bold_font = font.Font(textbox, textbox.cget("font"))
-    bold_font.configure(weight='bold')
-    # tag configuration
-    textbox.tag_configure('bold', font=bold_font)
-    set_tags = textbox.tag_names('sel.first')
-    # toggle on-off 
-    if 'bold' in set_tags:
-        textbox.tag_remove('bold', 'sel.first', 'sel.last')
+    # toggle on-off
+    if set_font['weight'] == 'bold':
+        set_font.config(weight='normal')
     else:
-        textbox.tag_add('bold', 'sel.first', 'sel.last')
-
+        set_font.config(weight='bold')
 
 def text_to_italics():
-    italics_font = font.Font(textbox, textbox.cget("font"))
-    italics_font.configure(slant='italic')
-    # tag configuration
-    textbox.tag_configure('italic', font=italics_font)
-    set_tags = textbox.tag_names('sel.first')
-    # toggle on-off  
-    if 'italic' in set_tags:
-        textbox.tag_remove('italic', 'sel.first', 'sel.last')
+    # toggle on-off
+    if set_font['slant'] == 'italic':
+        set_font.config(slant='roman')
     else:
-        textbox.tag_add('italic', 'sel.first', 'sel.last')
-
+        set_font.config(slant='italic')
 
 def rgb(hex_rgb):
     str_rgb = hex_rgb.replace('#', '')
@@ -227,9 +215,12 @@ font_size = StringVar(toolbar_frame)
 font_size.set(set_font['size'])
 font_size_menu = ttk.Combobox(toolbar_frame, textvariable=font_size, values=font_size_options, width=4, state='readonly')
 font_size_menu.bind('<ButtonRelease>', textbox.focus_set())
-#font_size_menu.configure(height=40, takefocus=0)
 font_size_menu.grid(row=0, column=3, padx=10)
 font_size_menu.bind("<<ComboboxSelected>>", apply_font_size_change)
+ttk.Style().configure('TCombobox', relief='groove', selectbackground=default_button_color, selectforeground='', 
+                    fieldbackground=default_button_color, background=default_button_color,
+                    activebackground=default_button_color, highlightbackground=default_button_color,
+                    highlightthickness=0)
 
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
