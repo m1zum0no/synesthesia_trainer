@@ -33,7 +33,8 @@ class FontPopup(Toplevel):
             font_treeview.tag_configure(font_tag, font=(font_name, 11))
             # adjusting dimensions of the cells to fit various fonts
             font_to_measure = font.Font(family=font_name, size=11)
-            font_height = font_to_measure.metrics("linespace")
+            font_height = int(font.Font(font=font_tag).metrics('ascent') * 1.3 \
+                          + font.Font(font=font_tag).metrics('descent') * 2)
             ''' exception for a particular problematic font on Linux 
             if font_name == 'MathJax_WinIE6':  # esint10 isn't getting displayed
                 # ???
