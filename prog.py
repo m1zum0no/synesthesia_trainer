@@ -21,8 +21,17 @@ color_table = {'def': '#ffffff', 'e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a',
                'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a',
                'q': '#b6e037', 'z': '#622c2d'}
 
+
+def clear_font_box_highlight():
+    current = font_size.get()
+    font_size.set("")
+    font_size.set(current)
+
+
 def apply_font_size_change(event):
     set_font.config(size=font_size_menu.get())
+    clear_font_box_highlight()
+
 
 def apply_font_change(font_name):
     set_font.config(family=font_name)
@@ -56,6 +65,7 @@ def display_window_icon():
         icon = Image.open('icons/palette.png')
         icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
 
+
 def text_to_bold():
     # toggle on-off
     if set_font['weight'] == 'bold':
@@ -63,12 +73,14 @@ def text_to_bold():
     else:
         set_font.config(weight='bold')
 
+
 def text_to_italics():
     # toggle on-off
     if set_font['slant'] == 'italic':
         set_font.config(slant='roman')
     else:
         set_font.config(slant='italic')
+
 
 def rgb(hex_rgb):
     str_rgb = hex_rgb.replace('#', '')
@@ -134,6 +146,7 @@ def apply_color():  # editing of text by char
                 textbox.tag_add(color, f'{line_index}.{char_index}')
     for color in color_table.values():
         textbox.tag_config(color, foreground=color)
+
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
@@ -217,16 +230,11 @@ font_size_menu = ttk.Combobox(toolbar_frame, textvariable=font_size, values=font
 font_size_menu.grid(row=0, column=3, padx=10)
 font_size_menu.bind("<<ComboboxSelected>>", apply_font_size_change)
 
-def highlight_clear(event):
-      current = font_size.get()
-      font_size.set("")
-      font_size.set(current)
 
-font_size_menu.bind("<<ComboboxSelected>>", highlight_clear)
-ttk.Style().configure('TCombobox', relief='raised', selectbackground=default_button_color, selectforeground='', 
-                    fieldbackground=default_button_color,
-                    activebackground=default_button_color,
-                    highlightforeground=default_button_color, highlightthickness=0)
+ttk.Style().configure('TCombobox', relief='raised', selectbackground=default_button_color, selectforeground='',
+                      fieldbackground=default_button_color,
+                      activebackground=default_button_color,
+                      highlightforeground=default_button_color, highlightthickness=0)
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
 apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
