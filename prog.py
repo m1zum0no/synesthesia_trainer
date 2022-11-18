@@ -2,8 +2,7 @@ from tkinter import filedialog, PhotoImage, Menu, Tk, Frame, Text, Scrollbar, La
 from tkinter import font
 from tkinter import ttk
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
-from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W
-
+from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
 
 from font_popup import FontPopup
 
@@ -150,7 +149,8 @@ def apply_color():  # editing of text by char
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
-    textbox.tag_add('sel', '1.0', 'end')
+    textbox.tag_add(SEL, '1.0', END)
+    return 'break'
 
 
 # root frame
@@ -197,8 +197,9 @@ textbox = Text(text_frame, font=set_font,
                width=76, height=20, selectbackground='grey', selectforeground='white',
                wrap=WORD, yscrollcommand=scroll_output.set)
 textbox.grid(row=0, column=0, sticky="nsew")
+textbox.bind("<Control-Key-a>", select_all)
+textbox.bind("<Control-Key-A>", select_all)
 scroll_output.config(command=textbox.yview)
-
 
 # Toolbar buttons
 # Font Picker setup 
