@@ -54,7 +54,7 @@ class FontPopup(Toplevel):
         font_treeview.bind('<Double-Button-1>', self.font_changed)
         font_treeview.bind('<Return>', self.font_changed)
 
-    def _on_exit(self):
+    def _on_exit(self, *args, **kwargs):
         self.withdraw()
 
     def __init__(self, *args, font_changed_callback: Callable[[str], None], **kwargs,):
@@ -65,3 +65,4 @@ class FontPopup(Toplevel):
         self.protocol('WM_DELETE_WINDOW', self._on_exit)
         self._initialize_content()
         self.font_changed_callback = font_changed_callback
+        self.bind('<Escape>', self._on_exit)
