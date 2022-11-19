@@ -3,6 +3,7 @@ from tkinter import font
 from tkinter import ttk
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
 from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
+from HoverInfo import HoverInfo
 
 from font_popup import FontPopup
 
@@ -216,12 +217,14 @@ bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, border
                      activebackground=default_button_color, highlightbackground=default_button_color,
                      highlightthickness=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
+tooltip_bold = HoverInfo(bold_button, 'Bold', True)
 
 img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41, 41)))
 italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
                         activebackground=default_button_color, highlightbackground=default_button_color,
                         highlightthickness=0)
 italics_button.grid(row=0, column=1, pady=8)
+tooltip_italics = HoverInfo(italics_button, 'Italics', True)
 
 # Sizes menu
 font_size_options = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
@@ -238,10 +241,11 @@ ttk.Style().configure('TCombobox', relief='raised', selectbackground=default_but
                       highlightforeground=default_button_color, highlightthickness=0)
 
 img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
-apply_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
+apply_palette_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
-apply_button.grid(row=0, column=4, padx=3)
+apply_palette_button.grid(row=0, column=4, padx=3)
+tooltip_apply_palette = HoverInfo(apply_palette_button, 'Применить палитру', True)
 
 
 # Menu
