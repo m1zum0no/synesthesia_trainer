@@ -64,6 +64,7 @@ def display_window_icon():
     else:
         icon = Image.open('icons/palette.png')
         icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
+        root.iconbitmap('./icons/palette.ico')
 
 
 def text_to_bold():
