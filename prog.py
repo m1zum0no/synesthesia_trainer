@@ -3,7 +3,7 @@ from tkinter import font
 from tkinter import ttk
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
 from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
-from HoverInfo import HoverInfo
+from hover_info import HoverInfo
 
 from font_popup import FontPopup
 
