@@ -218,14 +218,14 @@ bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, border
                      activebackground=default_button_color, highlightbackground=default_button_color,
                      highlightthickness=0)
 bold_button.grid(row=0, column=0, sticky=W, pady=2)
-tooltip_bold = HoverInfo(bold_button, 'Bold', True)
+tooltip_bold = HoverInfo(bold_button, 'Bold')
 
 img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41, 41)))
 italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
                         activebackground=default_button_color, highlightbackground=default_button_color,
                         highlightthickness=0)
 italics_button.grid(row=0, column=1, pady=8)
-tooltip_italics = HoverInfo(italics_button, 'Italics', True)
+tooltip_italics = HoverInfo(italics_button, 'Italics')
 
 # Sizes menu
 font_size_options = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
@@ -246,7 +246,7 @@ apply_palette_button = Button(toolbar_frame, image=img_color, command=apply_colo
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
 apply_palette_button.grid(row=0, column=4, padx=3)
-tooltip_apply_palette = HoverInfo(apply_palette_button, 'Применить палитру', True)
+tooltip_apply_palette = HoverInfo(apply_palette_button, 'Применить палитру')
 
 
 # Menu
