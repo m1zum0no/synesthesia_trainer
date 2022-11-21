@@ -38,7 +38,7 @@ class FontPopup(Toplevel):
             if font_name == 'MathJax_WinIE6':  # esint10 isn't getting displayed
                 # ???
             else: '''
-            style.configure('Treeview', rowheight=font_height)
+            style.configure('Treeview', rowheight=font_height + 10)
             font_width = font_to_measure.measure(font_name)
             # basing the window width on the parameters of the widest font
             max_font_width = max(max_font_width, font_width)
