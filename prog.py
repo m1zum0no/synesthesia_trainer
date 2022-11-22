@@ -1,3 +1,4 @@
+import signal
 from tkinter import filedialog, PhotoImage, Menu, Tk, Frame, Text, Scrollbar, Label, Button, StringVar, OptionMenu
 from tkinter import font
 from tkinter import ttk
@@ -283,5 +284,19 @@ status_bar = Label(root, text='', anchor=E)
 status_bar.pack(fill=X, side=BOTTOM, pady=5)  
 
 font_popup = FontPopup(root, font_changed_callback=apply_font_change)
+
+
+def handle_sigint(sig, frame):
+    root.quit()
+    root.update()
+    print('\nBye!')
+
+
+def check():
+    root.after(200, check)
+
+
+signal.signal(signal.SIGINT, handle_sigint)
+check()
 
 root.mainloop()
