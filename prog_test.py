@@ -282,10 +282,11 @@ status_bar.pack(fill=X, side=BOTTOM, pady=5)
 font_popup = FontPopup(root, font_changed_callback=apply_font_change)
 
 
-def handle_sigint(sig, frame):
-    root.quit()
-    root.update()
-    print('\nBye!')
+#def handle_sigint(sig, frame):
+#    root.quit()
+#    root.update()
+#    print('\nBye!')
+root.bind('<Escape>', root.quit)
 
 
 def check():
