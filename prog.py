@@ -207,7 +207,7 @@ scroll_output.config(command=textbox.yview)
 
 # Toolbar buttons
 # Font Picker setup 
-font_picker_opener = Button(toolbar_frame, text=set_font['family'], command=click_opener)
+font_picker_opener = Button(toolbar_frame, text=set_font['family'], font='TkDefaultFont', height=1, command=click_opener, relief='sunken')
 popup_opened = False  # flag for tracking multiple attempts to open popups
 font_picker_opener.grid(row=0, column=2, padx=3)
 
@@ -233,12 +233,12 @@ tooltip_italics = ToolTip(italics_button, msg='Italics')
 font_size_options = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
 font_size = StringVar(toolbar_frame)
 font_size.set(set_font['size'])
-font_size_menu = ttk.Combobox(toolbar_frame, textvariable=font_size, values=font_size_options, width=4, state='readonly')
+font_size_menu = ttk.Combobox(toolbar_frame, font=('Sarai', 16), textvariable=font_size, values=font_size_options, width=4, takefocus=0, state='readonly')
 font_size_menu.grid(row=0, column=3, padx=10)
 font_size_menu.bind("<<ComboboxSelected>>", apply_font_size_change)
 
 
-ttk.Style().configure('TCombobox', relief='raised', selectbackground=default_button_color, selectforeground='',
+ttk.Style().configure('TCombobox', relief='groove', selectbackground=default_button_color, selectforeground='',
                       fieldbackground=default_button_color,
                       activebackground=default_button_color,
                       highlightforeground=default_button_color, highlightthickness=0)
