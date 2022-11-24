@@ -1,6 +1,6 @@
 from tkinter import Button, Tk
 from itertools import cycle
-from color_gradient_inti7ary import *
+from color_gradient_with_options import *
 
 rgb_iter = cycle(colormap_hex)
 
@@ -11,7 +11,7 @@ def on_leave(e):
 
 def on_enter(e):
     bt.configure(activeforeground=next(rgb_iter))
-    bt.after(25, on_enter, e)
+    bt.after(speed_arg, on_enter, e)
 
 
 def do_nothing():

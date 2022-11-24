@@ -17,4 +17,5 @@ def generate_hex_from_theme(theme):
         colormap_hex.append(hex_arr[i])
 
 extracted_theme = sys.argv
+speed_arg = sys.argv[2]
 generate_hex_from_theme(extracted_theme[1])
