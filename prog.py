@@ -2,15 +2,11 @@ import signal
 from tkinter import filedialog, PhotoImage, Menu, Tk, Frame, Text, Scrollbar, Label, Button, StringVar, OptionMenu
 from tkinter import font
 from tkinter import ttk
-from tkinter.ttk import Treeview
-
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
 from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
-#from new import HoverInfo
 from tktooltip import ToolTip  # pip install tkinter-tooltip
-
 from popup import Popup
-from font_popup import FontPopup
+
 
 diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
             's', 'r', 'h', 'l', 'd', 'c', 

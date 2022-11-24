@@ -20,23 +20,29 @@ class Popup(Toplevel):
     def _initialize_content(self):
         style = Style()
 
+        default_font = font.nametofont('TkDefaultFont')
+
         tw = Treeview(self, show='tree', selectmode=BROWSE, style='popup.Treeview')
         tw.grid(row=1, column=0)
 
-        max_font_width = 0
+        max_font_width = default_font.measure(self.title()) + 40
         for item in self._items:
             item_tag = item.replace(' ', '_')
             item_id = tw.insert('', END, text=item, tags=(item_tag,))
             if self._item_inserted_callback:
                 self._item_inserted_callback(tw, item_id, item_tag)
 
+            font_family = font.nametofont('TkDefaultFont').actual()['family']
+            font_size = font.nametofont('TkDefaultFont').actual()['size']
+
             font_str = tw.tag_configure(item_tag)['font']
-            font_family, font_size = font_str.split('}') if '{' in font_str else font_str.split(' ')
-            font_family = font_family.strip('{} ')
-            font_size = int(font_size)
+            if font_str != '':
+                font_family, font_size = font_str.split('}') if '{' in font_str else font_str.split(' ')
+                font_family = font_family.strip('{} ')
+                font_size = int(font_size)
 
             # adjusting dimensions of the cells to fit various fonts
-            font_to_measure = font.Font(family=font_family, size=font_size)
+            font_to_measure = font.Font(family=font_family, size=font_size) if font_str else default_font
             font_height = font_to_measure.metrics("linespace")
 
             style.configure('popup.Treeview', rowheight=font_height + 10)
