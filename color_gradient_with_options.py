@@ -6,8 +6,8 @@ import seaborn as sns
 
 colormap_hex = []
 
-def generate_hex_from_theme():
-    cmap = mpl.colormaps['twilight_shifted']
+def generate_hex_from_theme(theme):
+    cmap = mpl.colormaps[theme]
     #if 'LinearSegmentedColormap' in type(cmap):
     cmap._init()
     rgbas = cmap._lut
@@ -16,5 +16,5 @@ def generate_hex_from_theme():
     for i in range(len(hex_arr) - 1):
         colormap_hex.append(hex_arr[i])
 
-generate_hex_from_theme()
-#generate_hex_from_theme(str(sys.argv[1]))
+extracted_theme = sys.argv
+generate_hex_from_theme(extracted_theme[1])
