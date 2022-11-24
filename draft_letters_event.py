@@ -1,8 +1,8 @@
-from tkinter import *
-from color_table import *
+from tkinter import Button, Tk
 from itertools import cycle
+from color_gradient_inti7ary import *
 
-rgb_iter = cycle(color_table)
+rgb_iter = cycle(colormap_hex)
 
 
 def on_leave(e):
@@ -11,7 +11,7 @@ def on_leave(e):
 
 def on_enter(e):
     bt.configure(activeforeground=next(rgb_iter))
-    bt.after(10, on_enter, e)
+    bt.after(25, on_enter, e)
 
 
 def do_nothing():
@@ -20,8 +20,9 @@ def do_nothing():
 
 root = Tk()
 
-bt = Button(root, text='да ладно это легко', font=('Helvetica', 15, 'bold'), command=do_nothing)
+bt = Button(root, text='■', font=('Helvetica', 15, 'bold'), command=do_nothing)
 bt.pack()
+
 def_fg = bt['fg']
 bt.bind("<Enter>", on_enter)
 bt.bind("<Leave>", on_leave)
