@@ -6,12 +6,14 @@ rgb_iter = cycle(colormap_hex)
 
 
 def on_leave(e):
+    if hasattr(bt, 'after_ident'):
+        bt.after_cancel(bt.after_ident)
     bt.configure(fg=def_fg)
 
 
 def on_enter(e):
     bt.configure(activeforeground=next(rgb_iter))
-    bt.after(speed_arg, on_enter, e)
+    bt.after_ident = bt.after(speed_arg, on_enter, e)
 
 
 def do_nothing():
