@@ -2,11 +2,14 @@ import signal
 from tkinter import filedialog, PhotoImage, Menu, Tk, Frame, Text, Scrollbar, Label, Button, StringVar, OptionMenu
 from tkinter import font
 from tkinter import ttk
+from tkinter.ttk import Treeview
+
 from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
 from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
 #from new import HoverInfo
 from tktooltip import ToolTip  # pip install tkinter-tooltip
 
+from popup import Popup
 from font_popup import FontPopup
 
 diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
@@ -22,6 +25,20 @@ color_table = {'def': '#ffffff', 'e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a',
                'g': '#77afa1', 'w': '#4c70ac', 'y': '#53ac4c', 'b': '#86ac4c',
                'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a',
                'q': '#b6e037', 'z': '#622c2d'}
+
+
+def get_fonts():
+    # retrieve all system fonts
+    fonts = sorted(set(font.families()))
+    # remove Noto Color Emoji font, which causes crashes on some systems
+    if 'Noto Color Emoji' in fonts:
+        fonts.remove('Noto Color Emoji')
+    return fonts
+
+
+def on_font_inserted(tw, item_id, tag):
+    font_name = tw.item(item_id)['text']
+    tw.tag_configure(tag, font=(font_name, 11))
 
 
 def clear_font_box_highlight():
@@ -282,9 +299,13 @@ root.bind('<Control-A>', select_all)
 
 # Status bar
 status_bar = Label(root, text='', anchor=E)
-status_bar.pack(fill=X, side=BOTTOM, pady=5)  
+status_bar.pack(fill=X, side=BOTTOM, pady=5)
 
-font_popup = FontPopup(root, font_changed_callback=apply_font_change)
+fonts = get_fonts()
+
+font_popup = Popup(title='Выбрать шрифт', items=fonts,
+                   item_selected_callback=apply_font_change,
+                   item_inserted_callback=on_font_inserted)
 
 
 def handle_sigint(sig, frame):
