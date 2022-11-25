@@ -1,6 +1,6 @@
 from tkinter import Button, Tk
 from itertools import cycle
-from color_gradient_with_options import *
+from rainbow_glow import *
 
 rgb_iter = cycle(colormap_hex)
 
