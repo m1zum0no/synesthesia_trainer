@@ -1,6 +1,6 @@
 from tkinter import Button, Tk
 from itertools import cycle
-from rainbow_glow import *
+from spectral_glow import *
 
 rgb_iter = cycle(colormap_hex)
 
@@ -13,7 +13,7 @@ def on_leave(e):
 
 def on_enter(e):
     bt.configure(activeforeground=next(rgb_iter))
-    bt.after_ident = bt.after(speed_arg, on_enter, e)
+    bt.after_ident = bt.after(15, on_enter, e)
 
 
 def do_nothing():
