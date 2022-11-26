@@ -34,5 +34,5 @@ purple_red_range = LinearSegmentedColormap.from_list('filler_range', (
                                                     (0.000, (0.361, 0.318, 0.639)),
                                                     (1.000, (0.620, 0.004, 0.259))), N=128)
 
-hex_from_LC(spectral, letters_fg_color_range)
 hex_from_LSC(purple_red_range, letters_fg_color_range)
+hex_from_LC(spectral, letters_fg_color_range)
