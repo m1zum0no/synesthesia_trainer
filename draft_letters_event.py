@@ -22,7 +22,11 @@ def do_nothing():
 
 root = Tk()
 
-bt = Button(root, text='■', font=('Helvetica', 15, 'bold'), command=do_nothing)
+dummy_bt = Button(root)
+default_button_color = dummy_bt['bg']
+bt = Button(root, text='A', font=('Helvetica', 20, 'bold'), command=do_nothing,
+            borderwidth=0,activebackground=default_button_color, highlightbackground=default_button_color,
+            highlightthickness=0)
 bt.pack()
 
 def_fg = bt['fg']
