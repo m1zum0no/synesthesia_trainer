@@ -1,8 +1,8 @@
 from tkinter import Button, Tk
 from itertools import cycle
-from spectral_glow import *
+from spectral_glow import letters_fg_color_range
 
-rgb_iter = cycle(colormap_hex)
+rgb_iter = cycle(letters_fg_color_range)
 
 
 def on_leave(e):
