@@ -6,6 +6,17 @@ from PIL import Image, ImageTk  # sudo apt-get install python3-pil.imagetk
 from tkinter.constants import END, WORD, X, TOP, RIGHT, Y, E, BOTTOM, W, SEL, INSERT
 from tktooltip import ToolTip  # pip install tkinter-tooltip
 from popup import Popup
+import polyglot   # pip install -U pycld2
+from polyglot.detect import Detector 
+from polyglot.detect.base import *
+
+def detect_language():
+    text = textbox.get("1.0", 'end-1c')
+    try:
+        tooltip_language_button.msg = Detector(text).languages[0].name
+    except UnknownLanguage:
+        pass
+        #language_button.config(text="Language not detected")
 
 
 diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
@@ -152,17 +163,28 @@ def close_file():
     status_bar.config(text='')
 
 
-def apply_color():  # editing of text by char
-    text_str = textbox.get(1.0, END)
-    lines = text_str.splitlines(True)
-    for line_index, line in enumerate(lines, start=1):
-        for char_index, ch in enumerate(line):
-            if ch.lower() in diff_lvl[:5 * 5]:
-                color = color_table[ch.lower()]
-                textbox.tag_add(color, f'{line_index}.{char_index}')
-    for color in color_table.values():
-        textbox.tag_config(color, foreground=color)
-
+def apply_color():  # palette preview
+    global is_colored
+    if not is_colored:
+        if 'def_color' in textbox.tag_names():
+            textbox.tag_remove('def_color', 1.0, END)
+        text_str = textbox.get(1.0, END)
+        lines = text_str.splitlines(True)
+        for line_index, line in enumerate(lines, start=1):
+            for char_index, ch in enumerate(line):
+                if ch.lower() in diff_lvl[:5 * 5]:
+                    color = color_table[ch.lower()]
+                    textbox.tag_add(color, f'{line_index}.{char_index}')
+            for color in color_table.values():
+                textbox.tag_config(color, foreground=color)
+            tooltip_apply_palette.msg = 'Отменить палитру'
+            is_colored = True
+    else:
+        def_color = 'black'
+        textbox.tag_add('def_color', 1.0, END)
+        textbox.tag_config('def_color', foreground=def_color)
+        tooltip_apply_palette.msg = 'Применить палитру'
+        is_colored = False
 
 # adding standard functionality Ctrl-A
 def select_all(press_key_event):
@@ -220,11 +242,12 @@ scroll_output.config(command=textbox.yview)
 
 # Toolbar buttons
 # Font Picker setup 
+
 font_picker_opener = Button(toolbar_frame, text=set_font['family'], font='TkDefaultFont', height=1, command=click_opener, relief='sunken')
 popup_opened = False  # flag for tracking multiple attempts to open popups
-font_picker_opener.grid(row=0, column=2, padx=3)
+font_picker_opener.grid(row=0, column=2, padx=20)
 
-img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((47, 47)))
+img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((52, 52)))
 # Obtaining the system-dependent background color value of the button to disable square-shaped 
 # highlighting ot the buttons with images when the mouse is hovered over them.
 default_button_color = font_picker_opener['bg']
@@ -232,14 +255,14 @@ default_button_color = font_picker_opener['bg']
 bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0,
                      activebackground=default_button_color, highlightbackground=default_button_color,
                      highlightthickness=0)
-bold_button.grid(row=0, column=0, sticky=W, pady=2)
+bold_button.grid(row=0, column=4, sticky=W)
 tooltip_bold = ToolTip(bold_button, msg="Bold")
 
-img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((41, 41)))
+img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((43, 43)))
 italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
                         activebackground=default_button_color, highlightbackground=default_button_color,
                         highlightthickness=0)
-italics_button.grid(row=0, column=1, pady=8)
+italics_button.grid(row=0, column=5, sticky=E)
 tooltip_italics = ToolTip(italics_button, msg='Italics')
 
 # Sizes menu
@@ -256,12 +279,22 @@ ttk.Style().configure('TCombobox', relief='groove', selectbackground=default_but
                       activebackground=default_button_color,
                       highlightforeground=default_button_color, highlightthickness=0)
 
-img_color = ImageTk.PhotoImage((Image.open('./icons/color-palette.png')).resize((35, 35)))
-apply_palette_button = Button(toolbar_frame, image=img_color, command=apply_color, borderwidth=0,
+img_rgb = ImageTk.PhotoImage(Image.open(('./icons/free-icon-rgb-3819516.png')).resize((33, 33)))
+# for toggling on-off state
+global is_colored
+is_colored = False
+apply_palette_button = Button(toolbar_frame, image=img_rgb, command=apply_color, borderwidth=0,
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
-apply_palette_button.grid(row=0, column=4, padx=3)
+apply_palette_button.grid(row=0, column=1, padx=10, sticky=E)
 tooltip_apply_palette = ToolTip(apply_palette_button, msg='Применить палитру')
+
+img_lang = ImageTk.PhotoImage(Image.open(('./icons/writing.png')).resize((37, 37)))
+language_button = Button(toolbar_frame, image=img_lang, command=detect_language, borderwidth=0,
+                      activebackground=default_button_color, highlightbackground=default_button_color,
+                      highlightthickness=0)
+language_button.grid(row=0, column=0, padx=5)
+tooltip_language_button = ToolTip(language_button, msg='Определить язык')
 
 
 # Menu
