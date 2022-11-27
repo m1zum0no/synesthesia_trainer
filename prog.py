@@ -81,7 +81,7 @@ def find_platform():
 
 def display_window_icon():
     if platform_name == 'Linux':
-        icon = PhotoImage(file='icons/palette.png')
+        icon = PhotoImage(file='icons/icon.png')
         root.wm_iconphoto(True, icon)
 #   icon = Image.open('icons/palette.png')        
 #   if platform_name == 'Mac':
@@ -247,7 +247,7 @@ font_picker_opener = Button(toolbar_frame, text=set_font['family'], font='TkDefa
 popup_opened = False  # flag for tracking multiple attempts to open popups
 font_picker_opener.grid(row=0, column=2)
 
-img_bold = ImageTk.PhotoImage((Image.open('./icons/b-cropped.png')).resize((31, 31)))
+img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((31, 31)))
 # Obtaining the system-dependent background color value of the button to disable square-shaped 
 # highlighting ot the buttons with images when the mouse is hovered over them.
 default_button_color = font_picker_opener['bg']
@@ -258,7 +258,7 @@ bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, border
 bold_button.grid(row=0, column=0, padx=(6, 0))
 tooltip_bold = ToolTip(bold_button, msg="Bold")
 
-img_italics = ImageTk.PhotoImage((Image.open('./icons/i-cropped.png')).resize((32, 32)))
+img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((32, 32)))
 italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
                         activebackground=default_button_color, highlightbackground=default_button_color,
                         highlightthickness=0)
@@ -279,7 +279,7 @@ ttk.Style().configure('TCombobox', relief='groove', selectbackground=default_but
                       activebackground=default_button_color,
                       highlightforeground=default_button_color, highlightthickness=0)
 
-img_rgb = ImageTk.PhotoImage(Image.open(('./icons/free-icon-rgb-3819516.png')).resize((33, 33)))
+img_rgb = ImageTk.PhotoImage(Image.open(('./icons/rgb.png')).resize((33, 33)))
 # for toggling on-off state
 global is_colored
 is_colored = False
@@ -289,7 +289,7 @@ apply_palette_button = Button(toolbar_frame, image=img_rgb, command=apply_color,
 apply_palette_button.grid(row=0, column=5)
 tooltip_apply_palette = ToolTip(apply_palette_button, msg='Применить палитру')
 
-img_lang = ImageTk.PhotoImage(Image.open(('./icons/writing.png')).resize((37, 37)))
+img_lang = ImageTk.PhotoImage(Image.open(('./icons/lang.png')).resize((37, 37)))
 language_button = Button(toolbar_frame, image=img_lang, command=detect_language, borderwidth=0,
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
