@@ -245,9 +245,9 @@ scroll_output.config(command=textbox.yview)
 
 font_picker_opener = Button(toolbar_frame, text=set_font['family'], font='TkDefaultFont', height=1, command=click_opener, relief='sunken')
 popup_opened = False  # flag for tracking multiple attempts to open popups
-font_picker_opener.grid(row=0, column=2, padx=20)
+font_picker_opener.grid(row=0, column=2)
 
-img_bold = ImageTk.PhotoImage((Image.open('./icons/b.png')).resize((52, 52)))
+img_bold = ImageTk.PhotoImage((Image.open('./icons/b-cropped.png')).resize((31, 31)))
 # Obtaining the system-dependent background color value of the button to disable square-shaped 
 # highlighting ot the buttons with images when the mouse is hovered over them.
 default_button_color = font_picker_opener['bg']
@@ -255,14 +255,14 @@ default_button_color = font_picker_opener['bg']
 bold_button = Button(toolbar_frame, image=img_bold, command=text_to_bold, borderwidth=0,
                      activebackground=default_button_color, highlightbackground=default_button_color,
                      highlightthickness=0)
-bold_button.grid(row=0, column=4, sticky=W)
+bold_button.grid(row=0, column=0, padx=(6, 0))
 tooltip_bold = ToolTip(bold_button, msg="Bold")
 
-img_italics = ImageTk.PhotoImage((Image.open('./icons/i.png')).resize((43, 43)))
+img_italics = ImageTk.PhotoImage((Image.open('./icons/i-cropped.png')).resize((32, 32)))
 italics_button = Button(toolbar_frame, image=img_italics, command=text_to_italics, borderwidth=0,
                         activebackground=default_button_color, highlightbackground=default_button_color,
                         highlightthickness=0)
-italics_button.grid(row=0, column=5, sticky=E)
+italics_button.grid(row=0, column=1, padx=(0, 3))
 tooltip_italics = ToolTip(italics_button, msg='Italics')
 
 # Sizes menu
@@ -270,7 +270,7 @@ font_size_options = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36]
 font_size = StringVar(toolbar_frame)
 font_size.set(set_font['size'])
 font_size_menu = ttk.Combobox(toolbar_frame, font=('Sarai', 16), textvariable=font_size, values=font_size_options, width=4, takefocus=0, state='readonly')
-font_size_menu.grid(row=0, column=3, padx=10)
+font_size_menu.grid(row=0, column=3, padx=(13, 11))
 font_size_menu.bind("<<ComboboxSelected>>", apply_font_size_change)
 
 
@@ -286,14 +286,14 @@ is_colored = False
 apply_palette_button = Button(toolbar_frame, image=img_rgb, command=apply_color, borderwidth=0,
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
-apply_palette_button.grid(row=0, column=1, padx=10, sticky=E)
+apply_palette_button.grid(row=0, column=5)
 tooltip_apply_palette = ToolTip(apply_palette_button, msg='Применить палитру')
 
 img_lang = ImageTk.PhotoImage(Image.open(('./icons/writing.png')).resize((37, 37)))
 language_button = Button(toolbar_frame, image=img_lang, command=detect_language, borderwidth=0,
                       activebackground=default_button_color, highlightbackground=default_button_color,
                       highlightthickness=0)
-language_button.grid(row=0, column=0, padx=5)
+language_button.grid(row=0, column=4, padx=(0, 11))
 tooltip_language_button = ToolTip(language_button, msg='Определить язык')
 
 
