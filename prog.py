@@ -12,11 +12,14 @@ from polyglot.detect.base import *
 
 def detect_language():
     text = textbox.get("1.0", 'end-1c')
-    try:
-        tooltip_language_button.msg = Detector(text).languages[0].name
-    except UnknownLanguage:
+    if not (text.isspace() or len(text) == 0):
+        try:
+            tooltip_language_button.msg = Detector(text).languages[0].name
+        except UnknownLanguage:
+            pass
+            #language_button.config(text="Language not detected")
+    else:
         pass
-        #language_button.config(text="Language not detected")
 
 
 diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
@@ -164,11 +167,11 @@ def close_file():
 
 
 def apply_color():  # palette preview
+    text_str = textbox.get(1.0, END)
     global is_colored
-    if not is_colored:
+    if not is_colored and not (len(text_str) == 0 or text_str.isspace()):
         if 'def_color' in textbox.tag_names():
             textbox.tag_remove('def_color', 1.0, END)
-        text_str = textbox.get(1.0, END)
         lines = text_str.splitlines(True)
         for line_index, line in enumerate(lines, start=1):
             for char_index, ch in enumerate(line):
