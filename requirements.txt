@@ -4,3 +4,4 @@ matplotlib==3.6.2
 seaborn==0.12.1
 polyglot==16.7.4
 PyICU==2.10.2
+arabic-reshaper==2.1.4
