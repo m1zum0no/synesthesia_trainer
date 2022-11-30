@@ -26,7 +26,7 @@ diff_lvl = ['e', 't', 'a', 'o', 'i', 'n',
             's', 'r', 'h', 'l', 'd', 'c', 
             'u', 'm', 'f', 'p', 'g', 'w', 
             'y', 'b', 'v', 'k', 'x', 'j',
-            'q', 'z']
+            'q', 'z', 'ﻳ']
 
 color_table = {'def': '#ffffff', 'e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a', 'o': '#8a94d1',
                'i': '#b98ad1', 'n': '#a2d18a', 's': '#d5ff0a', 'r': '#b7efe0',
@@ -34,7 +34,7 @@ color_table = {'def': '#ffffff', 'e': '#8accd2', 't': '#d2908a', 'a': '#d1c78a',
                'u': '#21236d', 'm': '#426a4a', 'f': '#ddc96c', 'p': '#b3b3af',
                'g': '#77afa1', 'w': '#4c70ac', 'y': '#53ac4c', 'b': '#86ac4c',
                'v': '#395213', 'k': '#758162', 'x': '#619a0b', 'j': '#35755a',
-               'q': '#b6e037', 'z': '#622c2d'}
+               'q': '#b6e037', 'z': '#622c2d', 'ﻳ': '#FF0000'}
 
 
 def get_fonts():
@@ -91,9 +91,9 @@ def display_window_icon():
 #       icon.save('icons/palette.icns',format = 'ICNS', sizes=[(32,32)])
 #       root.iconbitmap('icons/palette.icns') 
     else:
-        icon = Image.open('icons/palette.png')
-        icon.save('./icons/palette.ico', format='ICO', sizes=[(32, 32)])
-        root.iconbitmap('./icons/palette.ico')
+        icon = Image.open('icons/icon.png')
+        icon.save('./icons/icon.ico', format='ICO', sizes=[(32, 32)])
+        root.iconbitmap('./icons/icon.ico')
 
 
 def text_to_bold():
@@ -121,7 +121,7 @@ def rgb(hex_rgb):
 
 
 def encode_color(ch):
-    if ch.lower() in diff_lvl[:5 * 5]:
+    if ch.lower() in diff_lvl:
         return rgb(color_table[ch.lower()]) + ch
     return ch
 
@@ -175,7 +175,7 @@ def apply_color():  # palette preview
         lines = text_str.splitlines(True)
         for line_index, line in enumerate(lines, start=1):
             for char_index, ch in enumerate(line):
-                if ch.lower() in diff_lvl[:5 * 5]:
+                if ch.lower() in diff_lvl:
                     color = color_table[ch.lower()]
                     textbox.tag_add(color, f'{line_index}.{char_index}')
             for color in color_table.values():
