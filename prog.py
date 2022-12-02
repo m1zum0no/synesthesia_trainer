@@ -10,6 +10,19 @@ import polyglot   # pip install -U pycld2
 from polyglot.detect import Detector 
 from polyglot.detect.base import *
 
+def set_textbox(text):
+    textbox.delete(1.0,"end")  # tracking down the coursor 
+    textbox.insert(1.0, text)
+
+def extract_pdf(filename):
+    import fitz # pip install PyMuPDF
+    with fitz.open(filename) as doc:
+        text = ""
+        for page in doc:
+            text += page.get_text() 
+        return text
+
+
 def detect_language():
     text = textbox.get("1.0", 'end-1c')
     if not (text.isspace() or len(text) == 0):
@@ -154,9 +167,13 @@ def load_file():
     input_file = input_file.replace('\\', '/')
     update_status(input_file)
     # load the file
-    with open(input_file, 'r', encoding='utf-8') as input_file:
-        loaded_text = input_file.read()
-        textbox.insert(END, loaded_text)
+    if '.pdf' in input_file:
+        extracted_text = extract_pdf(input_file) 
+    else:    
+        with open(input_file, 'rb') as input_file:
+            print(chardet.detect(input_file.read()))
+            extracted_text = input_file.read()
+    set_textbox(extracted_text)
 
 
 # buttons
@@ -228,20 +245,17 @@ text_frame.pack(fill="both", expand=True)
 text_frame.grid_rowconfigure(0, weight=1)
 text_frame.grid_columnconfigure(0, weight=1)
 
-scroll_frame = Frame(text_frame)
-scroll_frame.grid(sticky="nw")
-
 # Text widget and its scrollbar 
-scroll_output = Scrollbar(scroll_frame, orient='vertical')
-scroll_output.pack(side=RIGHT, fill=Y)
+scrollbar_textbox = Scrollbar(text_frame, orient='vertical')
+scrollbar_textbox.pack(side="right", fill="y")
 set_font = font.Font(family='Helvetica', size=16)
 textbox = Text(text_frame, font=set_font,
                width=76, height=20, selectbackground='grey', selectforeground='white',
-               wrap=WORD, yscrollcommand=scroll_output.set)
-textbox.grid(row=0, column=0, sticky="nsew")
+               wrap=WORD, yscrollcommand=scrollbar_textbox.set)
+textbox.pack(side="left", fill="both", expand=True)
 textbox.bind("<Control-Key-a>", select_all)
 textbox.bind("<Control-Key-A>", select_all)
-scroll_output.config(command=textbox.yview)
+scrollbar_textbox.config(command=textbox.yview)
 
 # Toolbar buttons
 # Font Picker setup 
