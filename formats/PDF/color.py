@@ -1,4 +1,9 @@
 import fitz
+# All the available fonts (maybe excluding those licensed by Google at:
+# https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_fonts ?)
+# https://pymupdf.readthedocs.io/en/latest/font.html -- font list from pumupdf-fonts
+# fitz.Base14_fontdict -- base fonts invoked by codenames
+# ["Arial", "Times", "Times Roman"] -- 3 additional ones 
 
 def for_letter(page, text):
     page_data_blocks = page.get_text('rawdict')
