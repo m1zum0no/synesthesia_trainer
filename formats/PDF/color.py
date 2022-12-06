@@ -13,9 +13,12 @@ def for_letter(page, text):
                     for ch in span['chars']:
                         if ch['c'] == text:
                             letter = ch['c']
-                            selection_field = fitz.Rect(ch['bbox']) 
-                            #page.add_redact_annot(selection_field)
-                            #page.apply_redactions()
+                            rect = fitz.Rect(ch['bbox'])
+                            selection_field = +rect
+                            selection_field.y0 += rect.height * 0.4
+                            selection_field.y1 = selection_field.y0 + rect.height * 0.2 
+                            page.add_redact_annot(selection_field)
+                            page.apply_redactions()
                             tw = fitz.TextWriter(page.rect, color=(1, 0, 0))  # color-interpolation-filters="sRGB"
                             tw.append(ch['origin'], letter, font=used_font, fontsize=span["size"])
                             tw.write_text(page)
