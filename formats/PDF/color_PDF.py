@@ -1,4 +1,6 @@
 import fitz
+from colour import Color
+from prog import diff_lvl, color_table
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
@@ -24,12 +26,13 @@ def for_letter(page, text):
                     except StopIteration:  # replace text with fallback font if none found
                         #doc_font = 'fallback_font'
                         replace_font = True
+                        pass
                         # rewrite all the documnets to match the existing font
-                        pass  
                     the_font = fitz.Font(doc_font) 
                     for ch in span['chars']:
-                        if ch['c'] == text:
+                        if ch['c'].lower() in diff_lvl:
                             letter = ch['c']
+                            clr = Color(color_table[letter.lower()]).rgb  # convert hex value into rgb tulpe
                             rect = fitz.Rect(ch['bbox'])
                             # scaling down the selection field
                             # to avoid selecting surrounding letters
@@ -40,7 +43,7 @@ def for_letter(page, text):
                             page.add_redact_annot(selection_field)
                             page.apply_redactions()
                             # rewriting the letter in a new color
-                            tw = fitz.TextWriter(page.rect, color=(1, 0, 0))  # color-interpolation-filters="sRGB"
+                            tw = fitz.TextWriter(page.rect, color=clr)
                             tw.append(ch['origin'], letter, font=the_font, fontsize=span["size"])
                             tw.write_text(page)
                         
