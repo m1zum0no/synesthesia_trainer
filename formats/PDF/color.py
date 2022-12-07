@@ -1,31 +1,47 @@
 import fitz
-# All the available fonts (maybe excluding those licensed by Google at:
-# https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_fonts ?)
-# https://pymupdf.readthedocs.io/en/latest/font.html -- font list from pumupdf-fonts
-# fitz.Base14_fontdict -- base fonts invoked by codenames
-# ["Arial", "Times", "Times Roman"] -- 3 additional ones 
 
+# All the available fonts:
+supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
+for def_fontname in ("Arial", "Times", "Times Roman"):  # additional fonts  
+    supported_fontnames.append(def_fontname)
+
+# from pymupdf-fonts
+installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]
+for ext_fontname in installed_fonts:
+    supported_fontnames.append(ext_fontname)
+
+
+# if replace_font, ignore the level parameter and reqrite all letters in a new font 
 def for_letter(page, text):
     page_data_blocks = page.get_text('rawdict')
     for block in page_data_blocks['blocks']:
         if not block['type']:  # 0 for txt
             for line in block['lines']:
                 for span in line["spans"]:
-                    #curr_font = span['font']
-                    # search the correct fontname  
-                    used_font = fitz.Font('Arial')
-                    # doc.extractFont(font) for not present 
+                    try:  # searching for the canonic fontname 
+                        doc_font = next(fontname for fontname in supported_fontnames \
+                            if fontname.casefold() in span['font'].casefold())
+                    except StopIteration:  # replace text with fallback font if none found
+                        #doc_font = 'fallback_font'
+                        replace_font = True
+                        # rewrite all the documnets to match the existing font
+                        pass  
+                    the_font = fitz.Font(doc_font) 
                     for ch in span['chars']:
                         if ch['c'] == text:
                             letter = ch['c']
                             rect = fitz.Rect(ch['bbox'])
-                            selection_field = +rect
+                            # scaling down the selection field
+                            # to avoid selecting surrounding letters
+                            selection_field = +rect 
                             selection_field.y0 += rect.height * 0.4
-                            selection_field.y1 = selection_field.y0 + rect.height * 0.2 
+                            selection_field.y1 = selection_field.y0 + rect.height * 0.2
+                            # clearing out selected field 
                             page.add_redact_annot(selection_field)
                             page.apply_redactions()
+                            # rewriting the letter in a new color
                             tw = fitz.TextWriter(page.rect, color=(1, 0, 0))  # color-interpolation-filters="sRGB"
-                            tw.append(ch['origin'], letter, font=used_font, fontsize=span["size"])
+                            tw.append(ch['origin'], letter, font=the_font, fontsize=span["size"])
                             tw.write_text(page)
                         
 
@@ -37,4 +53,4 @@ fitz.TOOLS.set_small_glyph_heights(True)
 for page in doc: 
     for_letter(page, text) 
 
-doc.save("marked-" + doc.name)
+doc.save('edited-' + doc.name)
