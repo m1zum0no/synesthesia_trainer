@@ -67,7 +67,7 @@ class Popup(Toplevel):
                  title: str, resizable_x=False, resizable_y=False,
                  item_selected_callback: Callable[[str], None] = None,
                  item_inserted_callback: Callable[[Treeview, str, str], None] = None,
-                 items: Iterable[str] = [],
+                 items: Iterable[str] = None,
                  **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -79,6 +79,9 @@ class Popup(Toplevel):
 
         self._item_selected_callback = item_selected_callback
         self._item_inserted_callback = item_inserted_callback
+       
+        if items is None:
+            items = []
         self._items = items
 
         self._initialize_content()
