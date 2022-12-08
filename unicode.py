@@ -24,7 +24,6 @@ locales = icu.Locale('').getAvailableLocales()
 for key in locales.keys():
     l = icu.Locale(key)
 print(l.getDisplayName(l))
-print(l.getLocale("Arabic"))
 
 
 # testing char validity
