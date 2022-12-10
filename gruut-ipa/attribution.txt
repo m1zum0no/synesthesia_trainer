@@ -1,0 +1,1 @@
+The approximate IPA to letter mapping rules are provided by https://github.com/rhasspy/gruut-ipa
