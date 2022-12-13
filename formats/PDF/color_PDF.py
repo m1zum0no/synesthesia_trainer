@@ -1,6 +1,6 @@
 import fitz
 from colour import Color
-from prog import diff_lvl, color_table
+from tables import diff_lvl, color_table
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
