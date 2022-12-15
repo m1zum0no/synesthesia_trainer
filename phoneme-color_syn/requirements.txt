@@ -1,0 +1,4 @@
+num2words==0.5.12
+gruut==2.3.4
+gruut-ipa==0.13.0
+gruut-lang-en==2.0.0
