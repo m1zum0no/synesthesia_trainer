@@ -11,7 +11,7 @@ installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]
 supported_fontnames.extend([fn for fn in installed_fonts])
 
 
-# def scale_fontsize(span, text_span, the_font):
+# def scale_fontsize(span):
     # compute new fontsize such that text won't exceed the bbox width
     # curr_fsize = span["size"]
     # text_length = the_font.text_length(text, fontsize=curr_fsize)
@@ -54,8 +54,8 @@ def for_letter(page):
     for block in page_data_blocks['blocks']:
         if not block['type']:  # 0 for txt
             for line in block['lines']:
-                prev_tw = None
                 for span in line['spans']:
+                    prev_tw = None
                     the_font = fitz.Font(determine_font(span['font']))
                     the_fontsize = span["size"]*0.8
                     for ch in span['chars']:
@@ -64,19 +64,17 @@ def for_letter(page):
                         page.apply_redactions()
                         # rewriting the letter in a new color
                         tw = fitz.TextWriter(page.rect, color=color_letter(ch['c']))
-                        if not prev_tw:
+                        if prev_tw:
                             # initializing the first element
+                            tw.append(prev_tw.last_point, ch['c'], font=the_font, fontsize=the_fontsize)
+                        else:
                             tw.append(ch['origin'], ch['c'], font=the_font, fontsize=the_fontsize)
-                            tw.write_text(page) 
-                            prev_tw = tw
-                            continue
-                        tw.append(prev_tw.last_point, ch['c'], font=the_font, fontsize=the_fontsize)
                         tw.write_text(page)
                         prev_tw = tw
 
 
-fname = 'test.pdf'
+fname = 'long.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
-list(map(for_letter, doc.pages()))
+list(map(for_letter, doc.pages(-1)))
 doc.save('edited-' + doc.name)
