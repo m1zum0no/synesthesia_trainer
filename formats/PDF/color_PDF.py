@@ -1,3 +1,5 @@
+from typing import Iterable
+
 import fitz
 from colour import Color
 from tables import diff_lvl, color_table
@@ -26,10 +28,15 @@ def color_letter(letter):
         return Color(color_table[letter.lower()]).rgb  # convert hex value into rgb tulpe
 
 
+def get_text_writers(rect, letters: Iterable[str]) -> dict[str, fitz.TextWriter]:
+    """Get dict of TextWriters mapped to letters."""
+    return {letter: fitz.TextWriter(rect, color=color_letter(letter)) for letter in color_table}
+
+
 def contract_selection_field(letter_span):
     # scaling down the letter selection field
     # to avoid overlap between neighbouring letters
-    selection_field = +letter_span 
+    selection_field = +letter_span
     selection_field.y0 += letter_span.height * 0.4
     selection_field.y1 = selection_field.y0 + letter_span.height * 0.6
     return selection_field
@@ -51,29 +58,33 @@ def determine_font(used_font):
 
 def for_letter(page):
     page_data_blocks = page.get_text('rawdict')
+    writers = get_text_writers(page.rect, color_table.keys())
+
     for block in page_data_blocks['blocks']:
-        if not block['type']:  # 0 for txt
-            for line in block['lines']:
-                for span in line['spans']:
-                    prev_tw = None
-                    the_font = fitz.Font(determine_font(span['font']))
-                    the_fontsize = span["size"]*0.8
-                    for ch in span['chars']:
-                        # clearing out the spot where letter will be rewritten
-                        page.add_redact_annot(contract_selection_field(fitz.Rect(ch['bbox'])))
-                        page.apply_redactions()
-                        # rewriting the letter in a new color
-                        tw = fitz.TextWriter(page.rect, color=color_letter(ch['c']))
-                        if prev_tw:
-                            # initializing the first element
-                            tw.append(prev_tw.last_point, ch['c'], font=the_font, fontsize=the_fontsize)
-                        else:
-                            tw.append(ch['origin'], ch['c'], font=the_font, fontsize=the_fontsize)
-                        tw.write_text(page)
-                        prev_tw = tw
+        if block['type']:  # 0 for txt
+            continue
+
+        for line in block['lines']:
+            # add annotation for removing existing letters
+            page.add_redact_annot(contract_selection_field(fitz.Rect(line['bbox'])))
+            last_point = None
+
+            for span in line['spans']:
+                span_font = fitz.Font(determine_font(span['font']))
+                span_font_size = span['size'] * 0.8
+
+                for char in span['chars']:
+                    writer = writers.get(char['c'].casefold(), writers['def'])
+                    append_to = last_point if last_point else char['origin']
+                    writer.append(append_to, char['c'], font=span_font, fontsize=span_font_size)
+                    last_point = writer.last_point
+
+    page.apply_redactions()
+    for writer in writers.values():
+        writer.write_text(page)
 
 
-fname = 'long.pdf'
+fname = 'test.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
 list(map(for_letter, doc.pages(-1)))
