@@ -46,7 +46,7 @@ def determine_font(used_font):
         new_font += 'b' if 'Bold' in used_font else 'it' if 'Italic' in used_font else 'o'
         if new_font not in ('figit', 'figo'):
             new_font += 'i' if 'Italic' in used_font else 'o'
-        return new_font
+    return new_font
 
 
 def for_letter(page):
