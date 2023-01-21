@@ -1,8 +1,10 @@
 from typing import Iterable
-
 import fitz
 from colour import Color
 from tables import diff_lvl, color_table
+
+
+pages_chosen = -1  # a user-defined option
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
@@ -13,24 +15,23 @@ installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]
 supported_fontnames.extend([fn for fn in installed_fonts])
 
 
-# def scale_fontsize(span):
-    # compute new fontsize such that text won't exceed the bbox width
-    # curr_fsize = span["size"]
-    # text_length = the_font.text_length(text, fontsize=curr_fsize)
-    # if text_length <= text_span.width:
-    #     return curr_fsize
-    # new_size = text_span.width / text_length * curr_fsize  # new fontsize
-    # return new_size
+def scale_fontsize(span, new_font):
+    prev_fontheight = span['ascender'] - span['descender']
+    new_fontheight = new_font.ascender - new_font.descender
+    scaling_coeff = prev_fontheight / span['size'] 
+    lambda_height = prev_fontheight - new_fontheight
+    new_fontsize = span["size"] + lambda_height / scaling_coeff
+    return new_fontsize
 
 
 def color_letter(letter):
     if letter.lower() in diff_lvl:
-        return Color(color_table[letter.lower()]).rgb  # convert hex value into rgb tulpe
+        return Color(color_table[letter.lower()]).rgb  # convert hex value to rgb tulpe
 
 
 def get_text_writers(rect, letters: Iterable[str]) -> dict[str, fitz.TextWriter]:
     """Get dict of TextWriters mapped to letters."""
-    return {letter: fitz.TextWriter(rect, color=color_letter(letter)) for letter in color_table}
+    return {letter: fitz.TextWriter(rect, color=color_letter(letter)) for letter in letters}
 
 
 def contract_selection_field(letter_span):
@@ -56,7 +57,7 @@ def determine_font(used_font):
     return new_font
 
 
-def for_letter(page):
+def color_page(page):
     page_data_blocks = page.get_text('rawdict')
     writers = get_text_writers(page.rect, color_table.keys())
 
@@ -71,7 +72,7 @@ def for_letter(page):
 
             for span in line['spans']:
                 span_font = fitz.Font(determine_font(span['font']))
-                span_font_size = span['size'] * 0.8
+                span_font_size = scale_fontsize(span, span_font)
 
                 for char in span['chars']:
                     writer = writers.get(char['c'].casefold(), writers['def'])
@@ -87,5 +88,5 @@ def for_letter(page):
 fname = 'test.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
-list(map(for_letter, doc.pages(-1)))
+list(map(color_page, doc.pages(pages_chosen)))
 doc.save('edited-' + doc.name)
