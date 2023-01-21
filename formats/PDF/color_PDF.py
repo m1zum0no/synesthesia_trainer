@@ -2,6 +2,7 @@ import fitz
 from colour import Color
 from tables import diff_lvl, color_table
 
+
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
 supported_fontnames.extend([fn for fn in ("Arial", "Times", "Times Roman")])  # additional fonts
@@ -11,19 +12,18 @@ installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]
 supported_fontnames.extend([fn for fn in installed_fonts])
 
 
-# def scale_fontsize(span):
-    # compute new fontsize such that text won't exceed the bbox width
-    # curr_fsize = span["size"]
-    # text_length = the_font.text_length(text, fontsize=curr_fsize)
-    # if text_length <= text_span.width:
-    #     return curr_fsize
-    # new_size = text_span.width / text_length * curr_fsize  # new fontsize
-    # return new_size
+def scale_fontsize(span, new_font):
+    prev_fontheight = span['ascender'] - span['descender']
+    new_fontheight = new_font.ascender - new_font.descender
+    scaling_coeff = prev_fontheight / span['size'] 
+    lambda_height = prev_fontheight - new_fontheight
+    new_fontsize = span["size"] + lambda_height / scaling_coeff
+    return new_fontsize
 
 
 def color_letter(letter):
     if letter.lower() in diff_lvl:
-        return Color(color_table[letter.lower()]).rgb  # convert hex value into rgb tulpe
+        return Color(color_table[letter.lower()]).rgb  # convert hex value to rgb tulpe
 
 
 def contract_selection_field(letter_span):
@@ -54,10 +54,10 @@ def for_letter(page):
     for block in page_data_blocks['blocks']:
         if not block['type']:  # 0 for txt
             for line in block['lines']:
+                prev_tw = None
                 for span in line['spans']:
-                    prev_tw = None
                     the_font = fitz.Font(determine_font(span['font']))
-                    the_fontsize = span["size"]*0.8
+                    the_fontsize = scale_fontsize(span, the_font)
                     for ch in span['chars']:
                         # clearing out the spot where letter will be rewritten
                         page.add_redact_annot(contract_selection_field(fitz.Rect(ch['bbox'])))
