@@ -3,6 +3,9 @@ from colour import Color
 from tables import diff_lvl, color_table
 
 
+pages_chosen = -1  # a user-defined option 
+
+
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
 supported_fontnames.extend([fn for fn in ("Arial", "Times", "Times Roman")])  # additional fonts
@@ -49,7 +52,7 @@ def determine_font(used_font):
     return new_font
 
 
-def for_letter(page):
+def color_page(page):
     page_data_blocks = page.get_text('rawdict')
     for block in page_data_blocks['blocks']:
         if not block['type']:  # 0 for txt
@@ -76,5 +79,5 @@ def for_letter(page):
 fname = 'long.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
-list(map(for_letter, doc.pages(-1)))
+list(map(color_page, doc.pages(pages_chosen)))
 doc.save('edited-' + doc.name)
