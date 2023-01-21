@@ -51,9 +51,12 @@ def determine_font(used_font):
     except StopIteration:
         # else rewrite everything in a fallback font
         new_font = 'fig'
-        new_font += 'b' if 'Bold' in used_font else 'it' if 'Italic' in used_font else 'o'
-        if new_font not in ('figit', 'figo'):
-            new_font += 'i' if 'Italic' in used_font else 'o'
+
+        # figbi figbo figit figo
+        new_font += 'bi' if ('Bold' in used_font and 'Italic' in used_font) else \
+                    'bo' if ('Bold' in used_font) else \
+                    'it' if ('Italic' in used_font) else \
+                    'o'
     return new_font
 
 
