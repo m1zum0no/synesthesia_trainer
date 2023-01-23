@@ -4,7 +4,7 @@ from colour import Color
 from tables import diff_lvl, color_table
 
 
-pages_chosen = -1  # a user-defined option
+pages_chosen = 100  # a user-defined option
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
@@ -69,7 +69,7 @@ def color_page(page):
             continue
 
         for line in block['lines']:
-            # add annotation for removing existing letters
+            # clear up space for letters to be rewritten
             page.add_redact_annot(contract_selection_field(fitz.Rect(line['bbox'])))
             last_point = None
 
@@ -91,5 +91,6 @@ def color_page(page):
 fname = 'test.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
-list(map(color_page, doc.pages(pages_chosen)))
+list(map(color_page, doc.pages(0, pages_chosen, 1)))
+doc.select([i for i in range(pages_chosen)])
 doc.save('edited-' + doc.name)
