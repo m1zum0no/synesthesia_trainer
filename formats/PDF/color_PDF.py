@@ -88,7 +88,7 @@ def color_page(page):
         writer.write_text(page)
 
 
-fname = 'test.pdf'
+fname = 'long.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
 list(map(color_page, doc.pages(0, pages_chosen, 1)))
