@@ -74,8 +74,9 @@ def color_page(page):
             last_point = None
 
             for span in line['spans']:
-                span_font = fitz.Font(determine_font(span['font']))
-                span_font_size = scale_fontsize(span, span_font)
+                original_font = span['font']
+                span_font = fitz.Font(determine_font(original_font))
+                span_font_size = span['size'] if span_font == original_font else scale_fontsize(span, span_font)
 
                 for char in span['chars']:
                     writer = writers.get(char['c'].casefold(), writers['def'])
