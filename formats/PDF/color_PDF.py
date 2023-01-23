@@ -91,6 +91,6 @@ def color_page(page):
 fname = 'long.pdf'
 doc = fitz.open(fname)
 fitz.TOOLS.set_small_glyph_heights(True)
-list(map(color_page, doc.pages(0, pages_chosen, 1)))
 doc.select([i for i in range(pages_chosen)])
+list(map(color_page, doc.pages()))
 doc.save('edited-' + doc.name)
