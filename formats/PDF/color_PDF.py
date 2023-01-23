@@ -1,10 +1,12 @@
 from typing import Iterable
 import fitz
 from colour import Color
+from fitz import TEXT_PRESERVE_LIGATURES, TEXTFLAGS_TEXT
+
 from tables import diff_lvl, color_table
 
 
-pages_chosen = 100  # a user-defined option
+pages_chosen = 10  # a user-defined option
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
@@ -61,7 +63,7 @@ def determine_font(used_font):
 
 
 def color_page(page):
-    page_data_blocks = page.get_text('rawdict')
+    page_data_blocks = page.get_text('rawdict', flags=TEXTFLAGS_TEXT ^ TEXT_PRESERVE_LIGATURES)
     writers = get_text_writers(page.rect, color_table.keys())
 
     for block in page_data_blocks['blocks']:
