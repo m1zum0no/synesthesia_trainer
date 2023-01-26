@@ -5,8 +5,9 @@ from fitz import TEXT_PRESERVE_LIGATURES, TEXTFLAGS_TEXT
 
 from tables import diff_lvl, color_table
 
+used_fonts = {}
 
-pages_chosen = 10  # a user-defined option
+pages_chosen = 100  # a user-defined option
 
 # All the available fonts:
 supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
@@ -77,7 +78,12 @@ def color_page(page):
 
             for span in line['spans']:
                 original_font = span['font']
-                span_font = fitz.Font(determine_font(original_font))
+
+                if original_font not in used_fonts:
+                    used_fonts[original_font] = span_font = fitz.Font(determine_font(original_font))
+                else:
+                    span_font = used_fonts[original_font]
+
                 span_font_size = span['size'] if span_font == original_font else scale_fontsize(span, span_font)
 
                 for char in span['chars']:
