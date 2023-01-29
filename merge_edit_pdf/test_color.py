@@ -1,5 +1,6 @@
 from typing import Iterable
 import fitz
+from colour import Color
 from fitz import TEXT_PRESERVE_LIGATURES, TEXTFLAGS_TEXT
 from tables import difficulty_lvl
 # python3 -m cProfile -stime color_PDF.py  -- timing function
@@ -76,7 +77,7 @@ def color_page(page):
                 span_font_size = span['size'] if span_font == original_font else scale_fontsize(span, span_font)
 
                 for char in span['chars']:
-                    writer = writers.get(ord(char['c'].casefold()), fitz.TextWriter(page.rect, color='ffffff'))
+                    writer = writers.get(char['c'].casefold(), fitz.TextWriter(page.rect, color='#000000'))
                     append_to = last_point if last_point else char['origin']
                     writer.append(append_to, char['c'], font=span_font, fontsize=span_font_size)
                     last_point = writer.last_point
@@ -86,8 +87,9 @@ def color_page(page):
         writer.write_text(page)
 
 
-def driver_code(color_table):
-    color_table = color_table
+def driver_code(table):
+    global color_table
+    color_table = table
 
 
     # user-defined options
