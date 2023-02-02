@@ -25,7 +25,7 @@ def extract_pdf(filename):
 
 def detect_language():
     text = textbox.get("1.0", 'end-1c')
-    if not (text.isspace() or len(text) == 0):
+    if len(text) and not text.isspace():
         try:
             tooltip_language_button.msg = Detector(text).languages[0].name
         except UnknownLanguage:
