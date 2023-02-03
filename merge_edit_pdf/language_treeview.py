@@ -1,5 +1,5 @@
 from tkinter import *
-from popup import Popup
+from popup import *
 import icu
 # for generate_color_table()
 from random import random
@@ -8,13 +8,15 @@ from test_color import *
 
 
 def generate_color_table(lang_charset):
-    global color_table
+    global lang_chosen
     for unicode_char in lang_charset:
         color_table[unicode_char] = Color(hsl=(random() for _ in range(3))).hex
-    driver_code(color_table)
+    bridge_function(color_table, lang_chosen)
+    root.destroy()
+    print(lang_chosen)
+    print(color_table)
 
 
-# initialize the code - language denomination mapping structure
 def map_locale_refs():
     locale_to_lang = {}
     icu_locale_codes = icu.Locale('').getAvailableLocales()
@@ -23,58 +25,53 @@ def map_locale_refs():
     return locale_to_lang
 
 
-def unicode_chars_from_lang(picked_lang):
-    update_button_inscription = picked_lang
-    global button_lang_chooser
+def extract_charset(selected_item):
+    global lang_chosen
+    lang_chosen = selected_item
+
+    update_button_inscription = lang_chosen
     button_lang_chooser.config(text=update_button_inscription)
 
-    global root
-    root.destroy()
-
-    global color_table
-    color_table = {}
-    global locale_mapping
     for locale_code, lang_name in locale_mapping.items():
-        if picked_lang == locale_mapping[locale_code]:
-            picked_lang = locale_code
-    picked_lang = icu.Locale(picked_lang)
+        if selected_item == locale_mapping[locale_code]:
+            selected_item = locale_code
+
+    selected_item = icu.Locale(selected_item)
     lang_unicode_charset = []
+
     try:
-        unicodeset = icu.LocaleData(picked_lang.getName()).getExemplarSet()
+        unicodeset = icu.LocaleData(selected_item.getName()).getExemplarSet()
     except AttributeError:
         return []
+
     iter = icu.UnicodeSetIterator(unicodeset)
+
     for char in iter:
         try:
-            lang_unicode_charset.append(ord(char))
+            lang_unicode_charset.append(char)
         except TypeError:
             pass
+
     generate_color_table(lang_unicode_charset)
 
 
 def click_opener():
-    global lang_choice
     lang_choice.deiconify()
 
 
-def determine_language():
-    global root
-    root = Tk()
+root = Tk()
 
-    global locale_mapping
-    locale_mapping = map_locale_refs()
-    locale_mapping_unique = {code: lang for code, lang in locale_mapping.items() if '_' not in code}
+color_table = {}
 
-    global lang_choice
-    lang_choice = Popup(title='Выбрать язык', items=locale_mapping_unique.values(),
-                        item_selected_callback=unicode_chars_from_lang)
-  
-    global button_lang_chooser
-    button_lang_chooser = Button(root, text='Язык', font='TkDefaultFont', 
-                                command=click_opener, relief='sunken')
+locale_mapping = map_locale_refs()
+locale_mapping_unique = {code: lang for code, lang in locale_mapping.items() if '_' not in code}
 
-    button_lang_chooser.grid(row=0, column=0)
-    root.mainloop()
+lang_choice = Popup(title='Выбрать язык', items=locale_mapping_unique.values(),
+                    item_selected_callback=extract_charset)
 
+button_lang_chooser = Button(root, text='Язык', font='TkDefaultFont',
+                            command=click_opener, relief='sunken')
 
-determine_language()
+button_lang_chooser.grid(row=0, column=0)
+
+root.mainloop()

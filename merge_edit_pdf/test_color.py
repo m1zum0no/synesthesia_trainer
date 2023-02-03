@@ -2,8 +2,38 @@ from typing import Iterable
 import fitz
 from colour import Color
 from fitz import TEXT_PRESERVE_LIGATURES, TEXTFLAGS_TEXT
-from tables import difficulty_lvl
 # python3 -m cProfile -stime color_PDF.py  -- timing function
+import polyglot   # pip install -U pycld2
+from polyglot.detect import Detector
+from polyglot.detect.base import *
+
+
+def bridge_function(color_letter_map, lang):
+
+    # user-defined options
+    global color_table, difficulty_lvl, chosen_lang
+    color_table = color_letter_map
+    chosen_lang = lang
+
+    difficulty_lvl = color_table.keys()
+    # user_choice = int of letters for coloring to index letters list
+
+    pdf_filename = 'long.pdf'
+    pages_chosen = 10
+    driver_code(pdf_filename, pages_chosen)
+
+
+def init_fonts():
+    # store mappings of unsupported fonts onto fallback font with its weight/slant for optimization
+    global used_fonts, supported_fontnames
+    used_fonts = {}
+
+    # list of all fontnames, supported by the lib
+    supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
+    supported_fontnames.extend([fn for fn in ("Arial", "Times", "Times Roman")])
+
+    installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]  # from pymupdf-fonts
+    supported_fontnames.extend([fn for fn in installed_fonts])
 
 
 def scale_fontsize(span, new_font):
@@ -16,9 +46,11 @@ def scale_fontsize(span, new_font):
 
 
 def color_letter(letter):
-    global color_table
+    global color_table, difficulty_lvl
+    if not isinstance(letter, str):
+        return
     if letter.lower() in difficulty_lvl:
-        return Color(color_table[ord(letter.lower())]).rgb  # convert hex value to rgb tulpe
+        return Color(color_table[letter.lower()]).rgb  # convert hex value to rgb tulpe
 
 
 def get_text_writers(rect, letters: Iterable[str]) -> dict[str, fitz.TextWriter]:
@@ -53,9 +85,16 @@ def determine_font(used_font):
 
 
 def color_page(page):
-    global color_table
+
+    text_segment = []
     page_data_blocks = page.get_text('rawdict', flags=TEXTFLAGS_TEXT ^ TEXT_PRESERVE_LIGATURES)
-    writers = get_text_writers(page.rect, [chr(char_code) for char_code in color_table.keys()])
+
+    global color_table
+    writers = get_text_writers(page.rect, color_table.keys())
+    writers.update({'default': fitz.TextWriter(page.rect, color='#ffffff')})
+
+    if not (page_data_blocks['blocks']):
+        return None
 
     for block in page_data_blocks['blocks']:
         if block['type']:  # 0 for txt
@@ -77,7 +116,12 @@ def color_page(page):
                 span_font_size = span['size'] if span_font == original_font else scale_fontsize(span, span_font)
 
                 for char in span['chars']:
-                    writer = writers.get(char['c'].casefold(), fitz.TextWriter(page.rect, color='#000000'))
+                    symbol = char['c']
+
+                    # store data from page text segment to test whether the document can be edited reliably
+                    text_segment.append(symbol)
+
+                    writer = writers.get(char['c'].casefold(), writers['default'])
                     append_to = last_point if last_point else char['origin']
                     writer.append(append_to, char['c'], font=span_font, fontsize=span_font_size)
                     last_point = writer.last_point
@@ -86,31 +130,35 @@ def color_page(page):
     for writer in writers.values():
         writer.write_text(page)
 
-
-def driver_code(table):
-    global color_table
-    color_table = table
+    return ''.join(text_segment)
 
 
-    # user-defined options
-    fname = 'long.pdf'
-    pages_chosen = 100
+def has_text(extracted_text, is_editable):
+    global chosen_lang
+    if extracted_text:
+        # print(chosen_lang, Detector(extracted_text).languages[0].name)
+        if chosen_lang in [language.name for language in Detector(extracted_text).languages[:3]]:
+            is_editable += 1
+    return is_editable
 
-    global used_fonts
-    used_fonts = {}
-    
-    # All the available fonts:
-    global supported_fontnames
-    supported_fontnames = [str(fontname) for fontname in fitz.Base14_fontdict.values()]
-    supported_fontnames.extend([fn for fn in ("Arial", "Times", "Times Roman")])  # additional fonts
 
-    # from pymupdf-fonts
-    installed_fonts = [font['name'] for font in fitz.fitz_fontdescriptors.values()]
-    supported_fontnames.extend([fn for fn in installed_fonts])
-    
-    global doc
-    doc = fitz.open(fname)
+def driver_code(pdf_filename, pages_chosen):
+    init_fonts()
+    pdf = fitz.open(pdf_filename)
     fitz.TOOLS.set_small_glyph_heights(True)
-    doc.select([i for i in range(pages_chosen)])
-    list(map(color_page, doc.pages()))
-    doc.save('edited-' + doc.name)
+
+    # leave in memory only the pages that the user have chosen for editing 
+    # and discard the rest
+    pdf.select([page for page in range(pages_chosen)])
+
+    pdf_volume = pdf.page_count
+    is_editable = 0
+
+    for page_num, page in enumerate(pdf):  # .pages
+        is_editable = has_text(color_page(page), is_editable)
+        if not is_editable and page_num > (pdf_volume / 10 if pdf_volume > 150 else pdf_volume):
+            # pdf either doesn't contain the chosen language or is not editable
+            # and should be converted to another format
+            print('Not editable')
+            quit()
+    pdf.save('edited-' + pdf.name)
