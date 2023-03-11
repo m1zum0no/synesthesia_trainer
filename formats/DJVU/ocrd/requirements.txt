@@ -1,0 +1,16 @@
+# sudo apt install tesseract-ocr
+# sudo apt install tesseract-ocr-fra -- lang pkg
+
+Cython==0.29.33
+lxml==4.9.2
+pkg-config==0.29.2
+
+# sudo apt-get -y install djvulibre-bin
+python-djvulibre==0.8.8
+# libdjvulibre-dev has the ddjvuapi.pc file, which is then located with dpkg-query and copied to /usr/share/pkgconfig/.
+# sudo apt install libdjvulibre-dev
+# dpkg-query -L libdjvulibre-dev | grep "ddjvuapi.pc" | sudo xargs cp -t /usr/share/pkgconfig/
+
+# https://github.com/FriedrichFroebel/ocrodjvu -- clone
+# cd ocrodjvu > python3 setup.py install
+
