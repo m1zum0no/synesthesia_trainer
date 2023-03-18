@@ -4,25 +4,41 @@ import re
 from color_table import color_table
 
 
-def color_letters(letters_in_list):
-    with open('opencv_input.txt', 'a+') as output:
-        for letter in letters_in_list:
-            args = [int(coord) for coord in letter[:4]]
-            color = color_table.get(letter[4].lower(), '#000000').lstrip('#')
-            color = [int(color[i:i+2], 16) for i in (0, 2, 4)][::-1]  # BGR format
-            for c in color:
-                args.append(c)
-            args = [str(a) for a in args]
-            args = ' '.join(args)
-            output.write(args + '\n')
+def color_letters(coords, char):
+    global word
+    bgr_color = color_table.get(char.lower(), '#000000').lstrip('#')
+    bgr_color = [str(int(bgr_color[i:i+2], 16)) for i in (0, 2, 4)][::-1]  # BGR format
+    bgr_color = ' '.join(bgr_color)
+    output.write(coords + ' ' + bgr_color + ' ' + char + '\n')
+    word += char
+
+
+def parse_chars(word_data):
+    global word
+    word = ''
+    for char_data in re.finditer(r'char (?P<coords>[0-9 ]+) (?P<char>".")', word_data):
+        color_letters(char_data.group('coords'), char_data.group('char').strip('/"')) 
+    output.write(word + 2*'\n')
 
 
 def parse_letter_positions():
     with open('letters_positions_p67.txt', 'r') as input:
         for line in input.readlines()[2:]:
-            color_letters([[y.strip('\"')
-                            for y in x.group()[5:-1].split(' ')]
-                          for x in re.finditer(r'char (.*?)\)', line)])
+            last_word_idx = None
+            for word_data in re.finditer(r'word (?P<coords>[0-9 ]+) (?P<char_data>.*?)word', line):
+                word_coords = word_data.group('coords')
+                output.write(word_coords + '\n')
+                parse_chars(word_data.group('char_data'))
+                last_word_idx = word_data.span()[1] - 4
+            if last_word_idx:
+                line = line[last_word_idx:]
+                last_word = re.search(r'word (?P<coords>[0-9 ]+)', line)
+                last_word_coords = last_word.group('coords')
+                output.write(last_word_coords + '\n')
+                parse_chars(line[last_word.span()[1]:])
+                last_word_idx = None
 
 
-parse_letter_positions()
+with open('v5_opencv_input.txt', 'a+') as output:
+    parse_letter_positions()
+
