@@ -22,6 +22,7 @@ def parse_letter_positions():
                 output.write(glyph + ': ' + str(glyphs.count(glyph)) + '\n')     
 
 
+# To sort glyphs in an example lang in alphabetical order
 locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8') 
 with open('glyphs_wh.txt', 'a+') as output:
     parse_letter_positions()
