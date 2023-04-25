@@ -72,12 +72,13 @@ class CharBbox:
   x1 = None
   w = None
   h = None
+  overlap_preceeds = None
   left_coords_from_next_char = None
   corrected_coords = None
 
   def validate_gauges(self, word_bbox, w, h):
     glyph = word_bbox.font.glyphs.get(self.char, Glyph(w, h))
-    return (glyph.w, glyph.h) == (w, h)
+    return ((-1 <= (glyph.w - w) <= 1) and (-3 <= (glyph.h - h) <= 3))
 
   def validate_start_position(self, x0, word_bbox: WordBbox):
     return word_bbox.previous_char_bbox < x0 or word_bbox.x0 == x0
@@ -93,8 +94,15 @@ class CharBbox:
     if not any((x0, y0, x1, y1)):
       # == self.left_coords_from_next_char will be set after init
       return
-        
+    
+    try:
+      prev_char = word_bbox.chars[-2]  
+    except IndexError: 
+      prev_char = None
+         
     if self.validate_start_position(x0, word_bbox):
+      if word_bbox.maybe_overlap_follows:
+        word_bbox.maybe_overlap_follows = False
       self.x0 = x0
       self.y0 = y0
       w = x1 - self.x0
@@ -105,7 +113,12 @@ class CharBbox:
           self.glyph = word_bbox.font.glyphs[self.char]
         else:
           self.corrected_coords = True
-          word_bbox.maybe_overlap_follows = True
+          if prev_char and prev_char.left_coords_from_next_char:
+            self.overlap_preceeds = True
+          elif w > word_bbox.font.glyphs[self.char].w:  
+            word_bbox.maybe_overlap_follows = True  
+          else:
+            self.maybe_left_coords_from_next_char = True
           self.x1 = x1
           self.y1 = y1
           self.w = word_bbox.font.glyphs[self.char].w
@@ -121,17 +134,24 @@ class CharBbox:
       self.corrected_coords = True
       if self.char in word_bbox.font.glyphs:
         self.w = word_bbox.font.glyphs[self.char].w
-      prev_char = word_bbox.chars[-2]
       if word_bbox.maybe_overlap_follows:
-        # guaranteed that hasattr(prev_char, 'glyph') & prev_char.coords include current char's
+        # guaranteed that hasattr(prev_char, 'glyph')
+        if self.w and (prev_char.x1 - prev_char.x0) >= (prev_char.w + self.w):
+          self.y0 = prev_char.y0
+          self.x1, prev_char.x1 = prev_char.x1, None
+          self.y1 = prev_char.y1
+          self.h = self.y1 - self.y0  
+          self.x0 = self.x1 - self.w
+        elif not self.w:
+          print('))))00)))00))))0')
+        else:
+          prev_char.left_coords_from_next_char = True
+          self.overlap_preceeds = True
+          prev_char.x0 = x0
+          prev_char.y0 = y0
+          self.x0 = x1 - self.w
+          self.y0 = y0
         word_bbox.maybe_overlap_follows = False
-        self.y0 = prev_char.y0
-        self.x1, prev_char.x1 = prev_char.x1, None
-        self.y1 = prev_char.y1
-        self.h = self.y1 - self.y0  
-        if not hasattr(self, 'w'):
-          self.w = self.x1 - (prev_char.x0 + prev_char.w + 3)
-        self.x0 = self.x1 - self.w
       elif hasattr(prev_char, 'glyph') or (prev_char.corrected_coords and prev_char.char in word_bbox.font.glyphs):
         # previous char is reliably recognized correctly hence current's position starts at the next
         # and the next is either (1) contains positions of current and self
