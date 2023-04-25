@@ -4,22 +4,18 @@ import re
 from color_table import color_table
 
 
-def color_letters(coords, char, word_str):
-    word_str += char
-    bgr_color = color_table.get(char.lower(), '#000000').lstrip('#')
-    bgr_color = ' '.join([str(int(bgr_color[i:i+2], 16)) for i in (0, 2, 4)][::-1])  # BGR format
-    output.write(coords + ' ' + bgr_color + ' ' + char + '\n')
-    return word_str
+def color_letters(coords, char=''):
+    color = color_table.get(char.lower(), '#000000').lstrip('#')   
+    color = ' '.join([str(int(color[i:i+2], 16)) for i in (0, 2, 4)])
+    output.write(coords + ' ' + color + '\n')
 
 
 def parse_chars(not_parsed):
     global line
-    word_str = ''
     if next_word := re.search(r'word (?P<coords>[0-9 ]+)', line[not_parsed:]):
         next_word = not_parsed + next_word.span()[0]
     for char_data in re.finditer(r'char (?P<coords>[0-9 ]+) (?P<char>".")', line[not_parsed:next_word]):
-        word_str = color_letters(char_data.group('coords'), char_data.group('char').strip('/"'), word_str) 
-    output.write(word_str + 2*'\n')
+        color_letters(char_data.group('coords'), char_data.group('char').strip('/"')) 
 
 
 def parse_letter_positions():
@@ -27,10 +23,9 @@ def parse_letter_positions():
         global line
         for line in input.readlines()[2:]:
             for word_data in re.finditer(r'word (?P<coords>[0-9 ]+)', line):
-                output.write(word_data.group('coords') + '\n')
                 parse_chars(word_data.span()[1])
 
 
-with open('v5_opencv_input.txt', 'a+') as output:
+with open('opencv_formatted_coords.txt', 'a+') as output:
     parse_letter_positions()
 
