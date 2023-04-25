@@ -1,5 +1,6 @@
 # sudo apt install tesseract-ocr
 # sudo apt install tesseract-ocr-fra -- lang pkg
+tesseract-ocr==5.3.0-40-g19fe
 
 Cython==0.29.33
 lxml==4.9.2
