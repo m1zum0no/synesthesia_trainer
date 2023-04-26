@@ -6,7 +6,8 @@ djvudump file.djvu
 djvused myfile.djvu -e 'select N; size'
 
 # save page as a separate document 
-djvused file.djvu -e 'select N; save-page pN.djvu'
+# usable but might replicate references if multiple; to avoid references - 'save-page'
+djvused file.djvu -e 'select N; save-page-with pN.djvu'
 
 # extract chunks from single page DJVU, including BG44 for djvumakem
 # extensions: Sjbz=.cnk, Djbz=.djbz
@@ -32,10 +33,7 @@ djvumake edited-pN.djvu Sjbz=pN.cnk FGbz=filename|#color:x,y,w,h
 pdf2djvu -o file.djvu file.pdf
 
 # convert a page to .tiff for OpenCV 
-djvu -format=tiff -page=N file.djvu pN.tiff 
-
-# extract page; usable but might replicate references if multiple
-djvused input.djvu -e 'select N; save-page-with N.djvu' 
+ddjvu -format=tiff -page=N file.djvu pN.tiff 
 
 #for encoding FGbz_old: FGbz=bzzfile
 bzz -e input output 
